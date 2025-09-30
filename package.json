@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Test script for ranking API",
   "main": "test_ranking_api.js",
+  "engines": {
+    "node": "18.x"
+  },
   "scripts": {
     "test:ranking": "node test_ranking_api.js"
   },
