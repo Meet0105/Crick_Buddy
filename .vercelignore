@@ -1,0 +1,15 @@
+# Ignore any misplaced files that might cause Vercel build issues
+frontend/pages/series/MatchesTab.tsx
+frontend/pages/series/SeriesInfo.tsx
+frontend/pages/series/SeriesStatus.tsx
+frontend/pages/series/SeriesTabs.tsx
+frontend/pages/series/StatsTab.tsx
+frontend/pages/series/VenuesTab.tsx
+frontend/pages/series/utils/
+frontend/pages/teams/NewsSection.tsx
+frontend/pages/teams/ResultsSection.tsx
+frontend/pages/teams/SchedulesSection.tsx
+frontend/pages/teams/TeamHeader.tsx
+frontend/pages/teams/TeamInfo.tsx
+frontend/pages/teams/TeamNotFound.tsx
+frontend/pages/teams/utils/
