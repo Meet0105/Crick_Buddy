@@ -2,8 +2,7 @@
 node_modules/
 
 # Build outputs
-.next/
-out/
+dist/
 
 # Environment variables
 .env*
@@ -26,9 +25,12 @@ Thumbs.db
 *.tmp
 *.temp
 
-# Testing
+# Database files
+*.db
+*.sqlite
+
+# Coverage reports
 coverage/
-*.lcov
 
 # Runtime environment
 .env.local
@@ -54,12 +56,3 @@ firebase-debug.log*
 
 # TypeScript cache
 *.tsbuildinfo
-
-# Local development files
-*.local
-
-# Vercel
-.vercel/
-
-# Debug files
-*.debug.*
