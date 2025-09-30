@@ -47,9 +47,6 @@ yarn-error.log*
 # Optional eslint cache
 .eslintcache
 
-# dotenv environment variables file
-.env
-
 # Firebase
 .firebase/
 firebase-debug.log*
