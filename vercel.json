@@ -8,11 +8,5 @@
         "outputDirectory": "frontend/.next"
       }
     }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "frontend/$1"
-    }
   ]
 }
