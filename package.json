@@ -4,7 +4,7 @@
   "description": "Test script for ranking API",
   "main": "test_ranking_api.js",
   "engines": {
-    "node": "18.x"
+    "node": "22.x"
   },
   "scripts": {
     "test:ranking": "node test_ranking_api.js"
