@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
-import cors from 'cors';
+import cors, { CorsOptions } from 'cors';
 import connectDB from './config/db';
 import matchRoutes from './routes/matches';
 import playerRoutes from './routes/players';
@@ -11,14 +11,36 @@ import rankingsRoutes from './routes/rankings';
 import venueRoutes from './routes/venues';
 import photoRoutes from './routes/photos';
 
-// Load environment variables from the correct path
+// Load environment variables
 dotenv.config({ path: __dirname + '/../.env' });
 
 const app = express();
-app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001'],
-  credentials: true
-}));
+
+// ✅ Allowed origins
+const allowedOrigins: string[] = [
+  'http://localhost:3000',                  // local frontend
+  'https://crick-buddy-frontend-v.vercel.app', // deployed frontend
+  'https://crick-buddy-backend-v.vercel.app'   // backend URL (for self-referencing)
+];
+
+// ✅ CORS options
+const corsOptions: CorsOptions = {
+  origin: (origin, callback) => {
+    // Allow all origins in development
+    if (process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '2mb' }));
 
 // Log environment variables for debugging
