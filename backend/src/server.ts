@@ -16,28 +16,37 @@ dotenv.config({ path: __dirname + '/../.env' });
 
 const app = express();
 
-// ✅ Allowed origins
+// ✅ Allowed origins - Updated for flexible deployment
 const allowedOrigins: string[] = [
-  'http://localhost:3000',                  // local frontend
+  'http://localhost:3000',                    // local frontend (port 3000)
+  'http://localhost:3001',                    // local frontend (port 3001)
   'https://crick-buddy-frontend-v.vercel.app', // deployed frontend
-  'https://crick-buddy-backend-v.vercel.app'   // backend URL (for self-referencing)
+  'https://crick-buddy-backend-v.vercel.app',  // backend URL (for self-referencing)
 ];
 
-// ✅ CORS options
+// ✅ CORS options - Enhanced for Vercel deployment
 const corsOptions: CorsOptions = {
   origin: (origin, callback) => {
     // Allow all origins in development
     if (process.env.NODE_ENV === 'development') {
       callback(null, true);
-    } else if (!origin || allowedOrigins.includes(origin)) {
+    } else if (!origin) {
+      // Allow requests with no origin (mobile apps, curl, etc.)
+      callback(null, true);
+    } else if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else if (origin.includes('vercel.app')) {
+      // Allow all Vercel preview deployments
       callback(null, true);
     } else {
+      console.log('CORS blocked origin:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-rapidapi-key', 'x-rapidapi-host'],
+  optionsSuccessStatus: 200 // For legacy browser support
 };
 
 app.use(cors(corsOptions));

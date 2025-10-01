@@ -35,7 +35,7 @@ const Navbar = () => {
       const isOutsideTeams = teamsDropdownRef.current && !teamsDropdownRef.current.contains(event.target as Node);
       const isOutsideNews = newsDropdownRef.current && !newsDropdownRef.current.contains(event.target as Node);
       const isOutsideRankings = rankingsDropdownRef.current && !rankingsDropdownRef.current.contains(event.target as Node);
-      
+
       // Close dropdowns individually if click is outside each one
       if (isOutsideLiveScores) {
         setIsDropdownOpen(prev => ({ ...prev, 'live-scores': false }));
@@ -80,8 +80,8 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 transition-all duration-200 flex items-center"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,10 +89,10 @@ const Navbar = () => {
               </svg>
               Home
             </Link>
-            
+
             <div className="relative" ref={liveScoresDropdownRef}>
-              <button 
-                onClick={() => toggleDropdown('live-scores')} 
+              <button
+                onClick={() => toggleDropdown('live-scores')}
                 className="px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 transition-all duration-200 flex items-center"
               >
                 <div className="flex items-center">
@@ -136,8 +136,8 @@ const Navbar = () => {
             </div>
 
             <div className="relative" ref={seriesDropdownRef}>
-              <button 
-                onClick={() => toggleDropdown('series')} 
+              <button
+                onClick={() => toggleDropdown('series')}
                 className="px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 transition-all duration-200 flex items-center"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -150,10 +150,18 @@ const Navbar = () => {
               </button>
               {isDropdownOpen['series'] && (
                 <div className="absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl py-2 z-50">
-                  <Link href="/series" className="block px-4 py-3 text-sm text-gray-200 hover:bg-slate-700 transition-colors">
+                  <Link
+                    href="/series"
+                    className="block px-4 py-3 text-sm text-gray-200 hover:bg-slate-700 transition-colors"
+                    onClick={() => setIsDropdownOpen(prev => ({ ...prev, 'series': false }))}
+                  >
                     Current Series
                   </Link>
-                  <Link href="/series/archive" className="block px-4 py-3 text-sm text-gray-200 hover:bg-slate-700 transition-colors">
+                  <Link
+                    href="/series/archives"
+                    className="block px-4 py-3 text-sm text-gray-200 hover:bg-slate-700 transition-colors"
+                    onClick={() => setIsDropdownOpen(prev => ({ ...prev, 'series': false }))}
+                  >
                     Series Archive
                   </Link>
                 </div>
@@ -161,8 +169,8 @@ const Navbar = () => {
             </div>
 
             <div className="relative" ref={teamsDropdownRef}>
-              <button 
-                onClick={() => toggleDropdown('teams')} 
+              <button
+                onClick={() => toggleDropdown('teams')}
                 className="px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 transition-all duration-200 flex items-center"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -175,10 +183,18 @@ const Navbar = () => {
               </button>
               {isDropdownOpen['teams'] && (
                 <div className="absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl py-2 z-50">
-                  <Link href="/teams" className="block px-4 py-3 text-sm text-gray-200 hover:bg-slate-700 transition-colors">
+                  <Link
+                    href="/teams"
+                    className="block px-4 py-3 text-sm text-gray-200 hover:bg-slate-700 transition-colors"
+                    onClick={() => setIsDropdownOpen(prev => ({ ...prev, 'teams': false }))}
+                  >
                     International Teams
                   </Link>
-                  <Link href="/teams/domestic" className="block px-4 py-3 text-sm text-gray-200 hover:bg-slate-700 transition-colors">
+                  <Link
+                    href="/teams/domestic"
+                    className="block px-4 py-3 text-sm text-gray-200 hover:bg-slate-700 transition-colors"
+                    onClick={() => setIsDropdownOpen(prev => ({ ...prev, 'teams': false }))}
+                  >
                     Domestic Teams
                   </Link>
                 </div>
@@ -186,8 +202,8 @@ const Navbar = () => {
             </div>
 
             <div className="relative" ref={newsDropdownRef}>
-              <button 
-                onClick={() => toggleDropdown('news')} 
+              <button
+                onClick={() => toggleDropdown('news')}
                 className="px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 transition-all duration-200 flex items-center"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -200,13 +216,25 @@ const Navbar = () => {
               </button>
               {isDropdownOpen['news'] && (
                 <div className="absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl py-2 z-50">
-                  <Link href="/news/latest" className="block px-4 py-3 text-sm text-gray-200 hover:bg-slate-700 transition-colors">
+                  <Link
+                    href="/news/latest"
+                    className="block px-4 py-3 text-sm text-gray-200 hover:bg-slate-700 transition-colors"
+                    onClick={() => setIsDropdownOpen(prev => ({ ...prev, 'news': false }))}
+                  >
                     Latest News
                   </Link>
-                  <Link href="/news/match-reports" className="block px-4 py-3 text-sm text-gray-200 hover:bg-slate-700 transition-colors">
+                  <Link
+                    href="/news/match-reports"
+                    className="block px-4 py-3 text-sm text-gray-200 hover:bg-slate-700 transition-colors"
+                    onClick={() => setIsDropdownOpen(prev => ({ ...prev, 'news': false }))}
+                  >
                     Match Reports
                   </Link>
-                  <Link href="/news/features" className="block px-4 py-3 text-sm text-gray-200 hover:bg-slate-700 transition-colors">
+                  <Link
+                    href="/news/features"
+                    className="block px-4 py-3 text-sm text-gray-200 hover:bg-slate-700 transition-colors"
+                    onClick={() => setIsDropdownOpen(prev => ({ ...prev, 'news': false }))}
+                  >
                     Features
                   </Link>
                 </div>
@@ -214,8 +242,8 @@ const Navbar = () => {
             </div>
 
             <div className="relative" ref={rankingsDropdownRef}>
-              <button 
-                onClick={() => toggleDropdown('rankings')} 
+              <button
+                onClick={() => toggleDropdown('rankings')}
                 className="px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 transition-all duration-200 flex items-center"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -228,10 +256,18 @@ const Navbar = () => {
               </button>
               {isDropdownOpen['rankings'] && (
                 <div className="absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl py-2 z-50">
-                  <Link href="/rankings" className="block px-4 py-3 text-sm text-gray-200 hover:bg-slate-700 transition-colors">
+                  <Link
+                    href="/rankings"
+                    className="block px-4 py-3 text-sm text-gray-200 hover:bg-slate-700 transition-colors"
+                    onClick={() => setIsDropdownOpen(prev => ({ ...prev, 'rankings': false }))}
+                  >
                     Men's Rankings
                   </Link>
-                  <Link href="/rankings/women" className="block px-4 py-3 text-sm text-gray-200 hover:bg-slate-700 transition-colors">
+                  <Link
+                    href="/rankings/women"
+                    className="block px-4 py-3 text-sm text-gray-200 hover:bg-slate-700 transition-colors"
+                    onClick={() => setIsDropdownOpen(prev => ({ ...prev, 'rankings': false }))}
+                  >
                     Women's Rankings
                   </Link>
                 </div>
@@ -253,14 +289,14 @@ const Navbar = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
               </svg>
             </button>
-            
+
             <button className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-black font-semibold px-4 py-2 rounded-full text-sm transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
               Login
             </button>
           </div>
 
           {/* Mobile menu button */}
-          <button 
+          <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="md:hidden text-gray-200 focus:outline-none"
           >
@@ -275,8 +311,8 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden bg-slate-900 border-t border-slate-800">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="text-gray-200 block px-3 py-3 rounded-md text-base font-medium hover:bg-slate-800 transition-colors flex items-center"
               onClick={() => setIsMobileMenuOpen(false)}
             >
@@ -285,10 +321,10 @@ const Navbar = () => {
               </svg>
               Home
             </Link>
-            
+
             <div className="border-t border-slate-800 pt-2">
-              <button 
-                onClick={() => toggleDropdown('mobile-live')} 
+              <button
+                onClick={() => toggleDropdown('mobile-live')}
                 className="text-gray-200 w-full text-left block px-3 py-3 rounded-md text-base font-medium hover:bg-slate-800 transition-colors flex items-center justify-between"
               >
                 <div className="flex items-center">
@@ -317,8 +353,8 @@ const Navbar = () => {
               )}
             </div>
 
-            <Link 
-              href="/series" 
+            <Link
+              href="/series"
               className="text-gray-200 block px-3 py-3 rounded-md text-base font-medium hover:bg-slate-800 transition-colors flex items-center"
               onClick={() => setIsMobileMenuOpen(false)}
             >
@@ -328,8 +364,8 @@ const Navbar = () => {
               Series
             </Link>
 
-            <Link 
-              href="/teams" 
+            <Link
+              href="/teams"
               className="text-gray-200 block px-3 py-3 rounded-md text-base font-medium hover:bg-slate-800 transition-colors flex items-center"
               onClick={() => setIsMobileMenuOpen(false)}
             >
@@ -339,8 +375,8 @@ const Navbar = () => {
               Teams
             </Link>
 
-            <Link 
-              href="/news" 
+            <Link
+              href="/news"
               className="text-gray-200 block px-3 py-3 rounded-md text-base font-medium hover:bg-slate-800 transition-colors flex items-center"
               onClick={() => setIsMobileMenuOpen(false)}
             >
@@ -351,8 +387,8 @@ const Navbar = () => {
             </Link>
 
             <div className="border-t border-slate-800 pt-2">
-              <button 
-                onClick={() => toggleDropdown('mobile-rankings')} 
+              <button
+                onClick={() => toggleDropdown('mobile-rankings')}
                 className="text-gray-200 w-full text-left block px-3 py-3 rounded-md text-base font-medium hover:bg-slate-800 transition-colors flex items-center justify-between"
               >
                 <div className="flex items-center">
@@ -377,8 +413,8 @@ const Navbar = () => {
               )}
             </div>
 
-            <Link 
-              href="/records" 
+            <Link
+              href="/records"
               className="text-gray-200 block px-3 py-3 rounded-md text-base font-medium hover:bg-slate-800 transition-colors flex items-center"
               onClick={() => setIsMobileMenuOpen(false)}
             >
