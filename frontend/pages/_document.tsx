@@ -1,15 +1,15 @@
-import { Html, Head, Main, NextScript } from 'next/document'
+import Document from 'next/document'
 
-export default function Document() {
+export default function MyDocument() {
   return (
-    <Html lang="en">
-      <Head>
+    <Document.Html lang="en">
+      <Document.Head>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-      </Head>
+      </Document.Head>
       <body>
-        <Main />
-        <NextScript />
+        <Document.Main />
+        <Document.NextScript />
       </body>
-    </Html>
+    </Document.Html>
   )
 }
