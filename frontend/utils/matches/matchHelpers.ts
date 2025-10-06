@@ -22,9 +22,114 @@ export const extractTeamInfo = (currentMatch: any) => {
   const team2Name = team2.teamName || team2.name || currentMatch.raw?.matchInfo?.team2?.teamName || currentMatch.raw?.matchInfo?.team2?.name || 'Team 2';
   
   // Extract scores with better fallback logic
-  const team1Score = team1.score || { runs: 0, wickets: 0, overs: 0 };
-  const team2Score = team2.score || { runs: 0, wickets: 0, overs: 0 };
+  let team1Score = { runs: 0, wickets: 0, overs: 0 };
+  let team2Score = { runs: 0, wickets: 0, overs: 0 };
   
+  // Try to extract scores from team objects
+  if (team1.score && typeof team1.score === 'object') {
+    team1Score = {
+      runs: team1.score.runs || 0,
+      wickets: team1.score.wickets || 0,
+      overs: team1.score.overs || 0
+    };
+  }
+  
+  if (team2.score && typeof team2.score === 'object') {
+    team2Score = {
+      runs: team2.score.runs || 0,
+      wickets: team2.score.wickets || 0,
+      overs: team2.score.overs || 0
+    };
+  }
+  
+  // Try to extract scores from raw matchScore data
+  if (currentMatch.raw?.matchScore) {
+    if (currentMatch.raw.matchScore.team1Score) {
+      const rawScore = currentMatch.raw.matchScore.team1Score;
+      
+      // Handle innings-based scoring
+      let totalRuns = 0;
+      let totalWickets = 0;
+      let totalOvers = 0;
+      
+      Object.keys(rawScore).forEach(key => {
+        if (key.startsWith('inngs') || key.startsWith('inning')) {
+          const innings = rawScore[key];
+          totalRuns += innings.runs || 0;
+          // For wickets, we take the latest value (not sum)
+          totalWickets = Math.max(totalWickets, innings.wickets || innings.wkts || 0);
+          totalOvers += innings.overs || 0;
+        }
+      });
+      
+      // If no innings data, try direct fields
+      if (totalRuns === 0 && totalOvers === 0) {
+        totalRuns = rawScore.runs || rawScore.r || 0;
+        totalWickets = rawScore.wickets || rawScore.w || rawScore.wkts || 0;
+        totalOvers = rawScore.overs || rawScore.o || 0;
+      }
+      
+      team1Score = {
+        runs: totalRuns,
+        wickets: totalWickets,
+        overs: totalOvers
+      };
+    }
+    
+    if (currentMatch.raw.matchScore.team2Score) {
+      const rawScore = currentMatch.raw.matchScore.team2Score;
+      
+      // Handle innings-based scoring
+      let totalRuns = 0;
+      let totalWickets = 0;
+      let totalOvers = 0;
+      
+      Object.keys(rawScore).forEach(key => {
+        if (key.startsWith('inngs') || key.startsWith('inning')) {
+          const innings = rawScore[key];
+          totalRuns += innings.runs || 0;
+          // For wickets, we take the latest value (not sum)
+          totalWickets = Math.max(totalWickets, innings.wickets || innings.wkts || 0);
+          totalOvers += innings.overs || 0;
+        }
+      });
+      
+      // If no innings data, try direct fields
+      if (totalRuns === 0 && totalOvers === 0) {
+        totalRuns = rawScore.runs || rawScore.r || 0;
+        totalWickets = rawScore.wickets || rawScore.w || rawScore.wkts || 0;
+        totalOvers = rawScore.overs || rawScore.o || 0;
+      }
+      
+      team2Score = {
+        runs: totalRuns,
+        wickets: totalWickets,
+        overs: totalOvers
+      };
+    }
+  }
+  
+  // Try to extract scores from scorecard data
+  if (currentMatch.scorecard?.scorecard && Array.isArray(currentMatch.scorecard.scorecard)) {
+    if (currentMatch.scorecard.scorecard.length > 0) {
+      const innings1 = currentMatch.scorecard.scorecard[0];
+      team1Score = {
+        runs: innings1.totalRuns || innings1.total || innings1.runs || 0,
+        wickets: innings1.totalWickets || innings1.totalwickets || innings1.wickets || innings1.wkts || 0,
+        overs: innings1.totalOvers || innings1.totalovers || innings1.overs || 0
+      };
+    }
+    
+    if (currentMatch.scorecard.scorecard.length > 1) {
+      const innings2 = currentMatch.scorecard.scorecard[1];
+      team2Score = {
+        runs: innings2.totalRuns || innings2.total || innings2.runs || 0,
+        wickets: innings2.totalWickets || innings2.totalwickets || innings2.wickets || innings2.wkts || 0,
+        overs: innings2.totalOvers || innings2.totalovers || innings2.overs || 0
+      };
+    }
+  }
+
   return {
     team1,
     team2,

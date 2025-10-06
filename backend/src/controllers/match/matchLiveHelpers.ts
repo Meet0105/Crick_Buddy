@@ -106,6 +106,12 @@ export function processRawMatchData(match: any) {
       }
       // Handle direct matchInfo structure
       else if (match.raw.matchInfo) {
+        console.log('Processing direct matchInfo structure');
+        console.log('matchScore data available:', !!match.raw.matchScore);
+        if (match.raw.matchScore) {
+          console.log('matchScore keys:', Object.keys(match.raw.matchScore));
+          console.log('matchScore content:', JSON.stringify(match.raw.matchScore, null, 2));
+        }
         return extractMatchInfo(match.raw.matchInfo, match.raw.matchScore, match);
       }
       // Handle flat structure (the actual structure we're seeing in the data)
@@ -123,6 +129,11 @@ export function processRawMatchData(match: any) {
 
 // Helper function to extract match information from flat raw data structure
 export function extractMatchInfoFromFlatStructure(rawData: any, originalMatch: any) {
+  console.log('extractMatchInfoFromFlatStructure called with:', { 
+    rawDataKeys: Object.keys(rawData),
+    originalMatchId: originalMatch?.matchId
+  });
+  
   // Extract team information
   const team1Info = rawData.team1 || {};
   const team2Info = rawData.team2 || {};
@@ -137,7 +148,7 @@ export function extractMatchInfoFromFlatStructure(rawData: any, originalMatch: a
   let team2Score = { runs: 0, wickets: 0, overs: 0, balls: 0, runRate: 0 };
 
   // Check for score data in multiple locations
-  const matchScore = rawData.matchScore || originalMatch.matchScore || rawData.score || originalMatch.score || {};
+  const matchScore = rawData.matchScore || originalMatch.raw?.matchScore || originalMatch.matchScore || rawData.score || originalMatch.score || {};
   
   if (matchScore && Object.keys(matchScore).length > 0) {
     // Handle the specific structure we see in the data
@@ -160,7 +171,21 @@ export function extractMatchInfoFromFlatStructure(rawData: any, originalMatch: a
             const innings = teamScoreData[key];
             totalRuns += innings.runs || 0;
             // For wickets, we take the value from the last innings
-            totalWickets = innings.wickets || totalWickets;
+            totalWickets = innings.wickets || innings.wkts || totalWickets;
+            // For overs, we need to combine properly
+            if (innings.overs) {
+              totalOvers += innings.overs;
+            }
+          }
+        });
+      } else if (Object.keys(teamScoreData).some(key => key.startsWith('inng'))) {
+        // Handle alternative innings key format (inng1, inng2, etc.)
+        Object.keys(teamScoreData).forEach(key => {
+          if (key.startsWith('inng')) {
+            const innings = teamScoreData[key];
+            totalRuns += innings.runs || 0;
+            // For wickets, we take the value from the last innings
+            totalWickets = innings.wickets || innings.wkts || totalWickets;
             // For overs, we need to combine properly
             if (innings.overs) {
               totalOvers += innings.overs;
@@ -170,7 +195,7 @@ export function extractMatchInfoFromFlatStructure(rawData: any, originalMatch: a
       } else if (Object.keys(teamScoreData).length > 0) {
         // Handle single innings or flat structure
         totalRuns = teamScoreData.runs || 0;
-        totalWickets = teamScoreData.wickets || 0;
+        totalWickets = teamScoreData.wickets || teamScoreData.wkts || 0;
         totalOvers = teamScoreData.overs || 0;
         totalBalls = teamScoreData.balls || 0;
         runRate = teamScoreData.runRate || teamScoreData.runrate || teamScoreData.rpo || 0;
@@ -289,6 +314,17 @@ export function extractMatchInfoFromFlatStructure(rawData: any, originalMatch: a
 
 // Helper function to extract match information from raw data
 export function extractMatchInfo(matchInfo: any, matchScore: any, originalMatch: any) {
+  console.log('extractMatchInfo called with:', { 
+    matchInfo: !!matchInfo, 
+    matchScore: !!matchScore,
+    matchScoreType: typeof matchScore,
+    originalMatchId: originalMatch?.matchId
+  });
+  
+  if (matchScore) {
+    console.log('matchScore content:', JSON.stringify(matchScore, null, 2));
+  }
+  
   // Extract team information
   const team1Info = matchInfo.team1 || {};
   const team2Info = matchInfo.team2 || {};
@@ -467,36 +503,6 @@ export function extractScoresFromScorecard(scorecardData: any, matchData?: any):
   const team1Score = { runs: 0, wickets: 0, overs: 0, balls: 0, runRate: 0 };
   const team2Score = { runs: 0, wickets: 0, overs: 0, balls: 0, runRate: 0 };
   
-  // Determine which team batted first from toss or match data
-  let team2BattedFirst = false; // Default: team1 batted first
-  
-  if (matchData && matchData.raw) {
-    const tossStatus = matchData.raw.tossstatus || matchData.raw.tossStatus || '';
-    const team1Name = matchData.raw.team1?.teamname || matchData.raw.team1?.teamName || matchData.teams?.[0]?.teamName || '';
-    const team2Name = matchData.raw.team2?.teamname || matchData.raw.team2?.teamName || matchData.teams?.[1]?.teamName || '';
-    
-    // Check toss status to see who batted first
-    if (tossStatus.toLowerCase().includes('opt to bat') || tossStatus.toLowerCase().includes('elected to bat')) {
-      // The team mentioned in toss status batted first
-      if (team2Name && tossStatus.includes(team2Name)) {
-        team2BattedFirst = true;
-        console.log(`Detected: ${team2Name} (team2) batted first based on toss`);
-      } else if (team1Name && tossStatus.includes(team1Name)) {
-        team2BattedFirst = false;
-        console.log(`Detected: ${team1Name} (team1) batted first based on toss`);
-      }
-    } else if (tossStatus.toLowerCase().includes('opt to bowl') || tossStatus.toLowerCase().includes('elected to bowl')) {
-      // The team mentioned in toss status bowled first (so the OTHER team batted first)
-      if (team2Name && tossStatus.includes(team2Name)) {
-        team2BattedFirst = false; // team2 bowled, so team1 batted
-        console.log(`Detected: ${team1Name} (team1) batted first (${team2Name} opted to bowl)`);
-      } else if (team1Name && tossStatus.includes(team1Name)) {
-        team2BattedFirst = true; // team1 bowled, so team2 batted
-        console.log(`Detected: ${team2Name} (team2) batted first (${team1Name} opted to bowl)`);
-      }
-    }
-  }
-
   // Handle different scorecard data structures
   let inningsData = null;
   
@@ -522,101 +528,9 @@ export function extractScoresFromScorecard(scorecardData: any, matchData?: any):
     }
     
     // Handle Mongoose document structure - data might be in _doc field
-    let inningsData = innings;
+    let inningsObj = innings;
     if (innings._doc) {
-      inningsData = innings._doc;
-    }
-    
-    // Log the keys for debugging
-    const keys = Object.keys(inningsData);
-    console.log(`Innings ${index + 1} keys:`, keys.slice(0, 15)); // Log first 15 keys
-    
-    // Log the entire innings data for debugging (first few fields)
-    console.log(`Innings ${index + 1} data sample:`, {
-      totalRuns: inningsData.totalRuns,
-      total: inningsData.total,
-      runs: inningsData.runs,
-      score: inningsData.score,
-      wickets: inningsData.wickets,
-      overs: inningsData.overs
-    });
-    
-    // Log batsmen data if it exists
-    let batsmen = inningsData.batsmen || inningsData.batsman;
-    console.log(`Innings ${index + 1} batsmen/batsman data type:`, typeof batsmen);
-    
-    // Log the structure of batsmen/batsman data for debugging
-    if (batsmen && typeof batsmen === 'object') {
-      const batsmenKeys = Object.keys(batsmen);
-      console.log(`Innings ${index + 1} batsmen/batsman keys:`, batsmenKeys.slice(0, 10));
-      
-      // Log the actual batsman field data if it exists
-      if (inningsData.batsman) {
-        console.log(`Innings ${index + 1} inningsData.batsman type:`, typeof inningsData.batsman);
-        if (typeof inningsData.batsman === 'object') {
-          const batsmanKeys = Object.keys(inningsData.batsman);
-          console.log(`Innings ${index + 1} inningsData.batsman keys:`, batsmanKeys.slice(0, 10));
-          
-          // Check structure of individual batsman entries
-          batsmanKeys.forEach(key => {
-            const value = inningsData.batsman[key];
-            if (value && typeof value === 'object' && value.runs !== undefined) {
-              console.log(`Innings ${index + 1} batsman[${key}] has runs:`, value.runs);
-            }
-          });
-        }
-      }
-      
-      // Also log the inningsData.batsmen field specifically
-      if (inningsData.batsmen) {
-        console.log(`Innings ${index + 1} inningsData.batsmen type:`, typeof inningsData.batsmen);
-        if (typeof inningsData.batsmen === 'object' && !Array.isArray(inningsData.batsmen)) {
-          const batsmenKeys = Object.keys(inningsData.batsmen);
-          console.log(`Innings ${index + 1} inningsData.batsmen keys:`, batsmenKeys.slice(0, 10));
-        }
-      }
-      
-      // Check if any of the keys look like batsman data
-      const potentialBatsmenKeys = batsmenKeys.filter(key => {
-        const value = (batsmen as any)[key];
-        return value && typeof value === 'object' && value.runs !== undefined;
-      });
-      
-      if (potentialBatsmenKeys.length > 0) {
-        console.log(`Innings ${index + 1} potential batsmen keys:`, potentialBatsmenKeys);
-        // Log first potential batsman data
-        if (potentialBatsmenKeys.length > 0) {
-          const firstBatsman = (batsmen as any)[potentialBatsmenKeys[0]];
-          console.log(`Innings ${index + 1} first potential batsman data:`, firstBatsman);
-        }
-      }
-    }
-    
-    // Handle both array and object formats for logging
-    if (batsmen && !Array.isArray(batsmen)) {
-      // If it's an object, check if it has a batsman array property
-      if ((batsmen as any).batsman && Array.isArray((batsmen as any).batsman)) {
-        batsmen = (batsmen as any).batsman;
-      } 
-      // Or convert object values to array if it's a key-value object
-      else if (typeof batsmen === 'object' && batsmen !== null) {
-        const batsmenValues: any[] = Object.values(batsmen);
-        if (batsmenValues.length > 0 && batsmenValues[0].runs !== undefined) {
-          batsmen = batsmenValues;
-        } else {
-          batsmen = [];
-        }
-      } else {
-        batsmen = [];
-      }
-    }
-    
-    if (Array.isArray(batsmen)) {
-      console.log(`Innings ${index + 1} processed batsmen count:`, batsmen.length);
-      if (batsmen.length > 0) {
-        console.log(`Innings ${index + 1} first processed batsman keys:`, Object.keys(batsmen[0]));
-        console.log(`Innings ${index + 1} first processed batsman data:`, batsmen[0]);
-      }
+      inningsObj = innings._doc;
     }
     
     // Extract runs, wickets, and overs with multiple fallbacks
@@ -625,190 +539,81 @@ export function extractScoresFromScorecard(scorecardData: any, matchData?: any):
     let overs = 0;
     
     // Try to find runs in various possible locations
-    runs = inningsData.totalRuns || 
-           inningsData.total || 
-           inningsData.runs || 
-           inningsData.score ||
-           (inningsData.batTeamDetails ? inningsData.batTeamDetails.totalRuns : 0) ||
-           (inningsData.batTeamDetails ? inningsData.batTeamDetails.runs : 0) ||
-           (inningsData.batTeamDetails ? inningsData.batTeamDetails.score : 0) ||
-           (inningsData.scoreObj ? inningsData.scoreObj.totalRuns : 0) ||
-           (inningsData.scoreObj ? inningsData.scoreObj.runs : 0) ||
+    runs = inningsObj.totalRuns || 
+           inningsObj.total || 
+           inningsObj.runs || 
+           inningsObj.score ||
+           (inningsObj.batTeamDetails ? inningsObj.batTeamDetails.totalRuns : 0) ||
+           (inningsObj.batTeamDetails ? inningsObj.batTeamDetails.runs : 0) ||
+           (inningsObj.batTeamDetails ? inningsObj.batTeamDetails.score : 0) ||
+           (inningsObj.scoreObj ? inningsObj.scoreObj.totalRuns : 0) ||
+           (inningsObj.scoreObj ? inningsObj.scoreObj.runs : 0) ||
            0;
            
     // If still no runs, try to calculate from batsmen data
-    if (runs === 0 && (inningsData.batsmen || inningsData.batsman)) {
-      let batsmen = inningsData.batsmen || inningsData.batsman;
+    if (runs === 0) {
+      // Try to get batsmen data from different possible locations
+      let batsmenData = inningsObj.batsmen || inningsObj.batsman || {};
       
-      // Log what we're working with
-      console.log(`Innings ${index + 1}: Initial batsmen type:`, typeof batsmen, 'isArray:', Array.isArray(batsmen));
-      
-      // Handle different possible structures for batsmen data
-      if (batsmen && !Array.isArray(batsmen)) {
-        // If it's an object, check if it has a batsman array property
-        if ((batsmen as any).batsman && Array.isArray((batsmen as any).batsman)) {
-          batsmen = (batsmen as any).batsman;
-          console.log(`Innings ${index + 1}: Using batsmen.batsman array`);
-        } 
-        // Check if we should use the inningsData.batsman field directly
-        else if (inningsData.batsman && typeof inningsData.batsman === 'object') {
-          // Get all batsman entries from the inningsData.batsman object
-          const batsmanEntries = Object.entries(inningsData.batsman);
-          console.log(`Innings ${index + 1}: Found ${batsmanEntries.length} entries in inningsData.batsman`);
-          
-          // Filter for entries that look like batsman data (have runs property)
-          const validBatsmen = batsmanEntries.filter(([key, value]) => {
-            const isValid = value && 
-              typeof value === 'object' && 
-              (value as any).runs !== undefined;
-            if (isValid) {
-              console.log(`Innings ${index + 1}: Valid batsman entry [${key}]:`, (value as any).runs, 'runs');
-            }
-            return isValid;
-          }).map(([key, value]) => value);
-          
-          if (validBatsmen.length > 0) {
-            batsmen = validBatsmen;
-            console.log(`Innings ${index + 1}: Using ${validBatsmen.length} valid batsmen from inningsData.batsman`);
-          } else {
-            // If we have numeric keys, try to extract all values
-            const numericKeys = Object.keys(inningsData.batsman).filter(key => !isNaN(Number(key)));
-            if (numericKeys.length > 0) {
-              batsmen = numericKeys.map(key => inningsData.batsman[key]);
-              console.log(`Innings ${index + 1}: Using ${batsmen.length} batsmen from numeric keys`);
-            } else {
-              batsmen = [];
-              console.log(`Innings ${index + 1}: No valid batsmen found in inningsData.batsman`);
-            }
-          }
-        }
-        // Check if it's the main batsman object with individual batsman properties
-        else if (typeof batsmen === 'object' && batsmen !== null) {
-          // Try to get all batsman entries from the object
-          const batsmenEntries = Object.entries(batsmen);
-          console.log(`Innings ${index + 1}: Found ${batsmenEntries.length} entries in batsmen object`);
-          
-          // Filter for entries that look like batsman data (have runs property)
-          const validBatsmen = batsmenEntries.filter(([key, value]) => {
-            const isValid = key !== 'batsman' &&  // Exclude the batsman property itself if it exists
-              value && 
-              typeof value === 'object' && 
-              (value as any).runs !== undefined;
-            if (isValid) {
-              console.log(`Innings ${index + 1}: Valid batsman entry [${key}]:`, (value as any).runs, 'runs');
-            }
-            return isValid;
-          }).map(([key, value]) => value);
-          
-          if (validBatsmen.length > 0) {
-            batsmen = validBatsmen;
-            console.log(`Innings ${index + 1}: Using ${validBatsmen.length} valid batsmen from batsmen object`);
-          } else {
-            batsmen = [];
-            console.log(`Innings ${index + 1}: No valid batsmen found in batsmen object`);
-          }
+      // If batsmenData is an array, use it directly
+      if (Array.isArray(batsmenData)) {
+        runs = batsmenData.reduce((total, batsman) => total + (batsman?.runs || 0), 0);
+      } 
+      // If batsmenData is an object, check for numeric keys or batsman array
+      else if (typeof batsmenData === 'object' && batsmenData !== null) {
+        // Check if there's a batsman array property
+        if (Array.isArray(batsmenData.batsman)) {
+          runs = batsmenData.batsman.reduce((total: number, batsman: any) => total + (batsman?.runs || 0), 0);
         } else {
-          batsmen = [];
-          console.log(`Innings ${index + 1}: batsmen is not an object or array, setting to empty array`);
-        }
-      } else if (batsmen && Array.isArray(batsmen) && batsmen.length === 0) {
-        // If batsmen is an empty array, try to populate it from inningsData.batsman
-        console.log(`Innings ${index + 1}: batsmen is empty array, checking inningsData.batsman`);
-        if (inningsData.batsman && typeof inningsData.batsman === 'object') {
-          // Get all batsman entries from the inningsData.batsman object
-          const batsmanEntries = Object.entries(inningsData.batsman);
-          console.log(`Innings ${index + 1}: Found ${batsmanEntries.length} entries in inningsData.batsman`);
-          
-          // Filter for entries that look like batsman data (have runs property)
-          const validBatsmen = batsmanEntries.filter(([key, value]) => {
-            const isValid = value && 
-              typeof value === 'object' && 
-              (value as any).runs !== undefined;
-            if (isValid) {
-              console.log(`Innings ${index + 1}: Valid batsman entry [${key}]:`, (value as any).runs, 'runs');
-            }
-            return isValid;
-          }).map(([key, value]) => value);
-          
-          if (validBatsmen.length > 0) {
-            batsmen = validBatsmen;
-            console.log(`Innings ${index + 1}: Using ${validBatsmen.length} valid batsmen from inningsData.batsman`);
+          // Check for numeric keys in the object
+          const numericKeys = Object.keys(batsmenData).filter(key => /^\d+$/.test(key));
+          if (numericKeys.length > 0) {
+            runs = numericKeys.reduce((total, key) => total + (batsmenData[key]?.runs || 0), 0);
           } else {
-            // If we have numeric keys, try to extract all values
-            const numericKeys = Object.keys(inningsData.batsman).filter(key => !isNaN(Number(key)));
-            if (numericKeys.length > 0) {
-              batsmen = numericKeys.map(key => inningsData.batsman[key]);
-              console.log(`Innings ${index + 1}: Using ${batsmen.length} batsmen from numeric keys`);
+            // Try to get all values from the object and sum runs
+            const values = Object.values(batsmenData);
+            if (Array.isArray(values) && values.length > 0 && (values[0] as any)?.runs !== undefined) {
+              runs = values.reduce((total: number, batsman: any) => total + (batsman?.runs || 0), 0);
             }
           }
         }
-      }
-      
-      console.log(`Innings ${index + 1}: Final batsmen array length:`, Array.isArray(batsmen) ? batsmen.length : 'not an array');
-      
-      if (Array.isArray(batsmen) && batsmen.length > 0) {
-        // Calculate total runs from individual batsmen scores
-        runs = batsmen.reduce((total, batsman) => {
-          const batsmanRuns = batsman?.runs || 0;
-          console.log(`Innings ${index + 1}: Adding batsman runs: ${batsmanRuns}`);
-          return total + batsmanRuns;
-        }, 0);
-        console.log(`Innings ${index + 1}: Calculated runs from batsmen data: ${runs}`);
       }
     }
            
     // Try to find wickets in various possible locations
-    wickets = inningsData.totalWickets || 
-              inningsData.wickets || 
-              inningsData.wkts ||
-              (inningsData.batTeamDetails ? inningsData.batTeamDetails.totalWickets : 0) ||
-              (inningsData.batTeamDetails ? inningsData.batTeamDetails.wickets : 0) ||
-              (inningsData.batTeamDetails ? inningsData.batTeamDetails.wkts : 0) ||
-              (inningsData.scoreObj ? inningsData.scoreObj.totalWickets : 0) ||
-              (inningsData.scoreObj ? inningsData.scoreObj.wickets : 0) ||
+    wickets = inningsObj.totalWickets || 
+              inningsObj.wickets || 
+              inningsObj.wkts ||
+              (inningsObj.batTeamDetails ? inningsObj.batTeamDetails.totalWickets : 0) ||
+              (inningsObj.batTeamDetails ? inningsObj.batTeamDetails.wickets : 0) ||
+              (inningsObj.batTeamDetails ? inningsObj.batTeamDetails.wkts : 0) ||
+              (inningsObj.scoreObj ? inningsObj.scoreObj.totalWickets : 0) ||
+              (inningsObj.scoreObj ? inningsObj.scoreObj.wickets : 0) ||
               0;
               
     // Try to find overs in various possible locations
-    overs = inningsData.totalOvers || 
-            inningsData.overs || 
-            inningsData.over ||
-            (inningsData.batTeamDetails ? inningsData.batTeamDetails.totalOvers : 0) ||
-            (inningsData.batTeamDetails ? inningsData.batTeamDetails.overs : 0) ||
-            (inningsData.batTeamDetails ? inningsData.batTeamDetails.over : 0) ||
-            (inningsData.scoreObj ? inningsData.scoreObj.totalOvers : 0) ||
-            (inningsData.scoreObj ? inningsData.scoreObj.overs : 0) ||
+    overs = inningsObj.totalOvers || 
+            inningsObj.overs || 
+            inningsObj.over ||
+            (inningsObj.batTeamDetails ? inningsObj.batTeamDetails.totalOvers : 0) ||
+            (inningsObj.batTeamDetails ? inningsObj.batTeamDetails.overs : 0) ||
+            (inningsObj.batTeamDetails ? inningsObj.batTeamDetails.over : 0) ||
+            (inningsObj.scoreObj ? inningsObj.scoreObj.totalOvers : 0) ||
+            (inningsObj.scoreObj ? inningsObj.scoreObj.overs : 0) ||
             0;
     
     console.log(`Innings ${index + 1}: runs=${runs}, wickets=${wickets}, overs=${overs}`);
     
     // Determine which team batted in this innings
-    const inningsId = inningsData.inningsid || inningsData.inningsId || (index + 1).toString();
-    const inningsNum = parseInt(inningsId);
+    // Simple approach: alternate innings between teams
+    // Innings 0, 2, 4... = Team 1
+    // Innings 1, 3, 5... = Team 2
+    const isTeam1Innings = (index % 2 === 0);
     
-    // In cricket scorecard:
-    // - Innings 1 & 3 = Team that batted first
-    // - Innings 2 & 4 = Team that batted second
-    
-    const isFirstBattingTeamInnings = (inningsNum % 2 === 1); // Innings 1, 3, 5... = first batting team
-    
-    // Determine which team score to update based on who batted first
-    let updateTeam1 = false;
-    if (team2BattedFirst) {
-      // If team2 batted first, then:
-      // - Odd innings (1,3) = team2
-      // - Even innings (2,4) = team1
-      updateTeam1 = !isFirstBattingTeamInnings;
-    } else {
-      // If team1 batted first (default), then:
-      // - Odd innings (1,3) = team1
-      // - Even innings (2,4) = team2
-      updateTeam1 = isFirstBattingTeamInnings;
-    }
-    
-    if (updateTeam1) {
+    if (isTeam1Innings) {
       // Add to team1's score (accumulate across innings)
       team1Score.runs += runs;
-      team1Score.wickets = wickets; // Use latest wickets
+      team1Score.wickets = wickets; // Use latest wickets for this innings
       team1Score.overs += overs;
       // Calculate balls from overs (e.g., 12.3 overs = 12*6 + 3 = 75 balls)
       team1Score.balls = Math.floor(team1Score.overs) * 6 + Math.round((team1Score.overs - Math.floor(team1Score.overs)) * 10);
@@ -817,11 +622,11 @@ export function extractScoresFromScorecard(scorecardData: any, matchData?: any):
       if (team1Score.overs > 0) {
         team1Score.runRate = parseFloat((team1Score.runs / team1Score.overs).toFixed(2));
       }
-      console.log(`Assigned innings ${inningsNum} to team1`);
+      console.log(`Assigned innings ${index + 1} to team1`);
     } else {
       // Add to team2's score (accumulate across innings)
       team2Score.runs += runs;
-      team2Score.wickets = wickets; // Use latest wickets
+      team2Score.wickets = wickets; // Use latest wickets for this innings
       team2Score.overs += overs;
       // Calculate balls from overs
       team2Score.balls = Math.floor(team2Score.overs) * 6 + Math.round((team2Score.overs - Math.floor(team2Score.overs)) * 10);
@@ -830,7 +635,7 @@ export function extractScoresFromScorecard(scorecardData: any, matchData?: any):
       if (team2Score.overs > 0) {
         team2Score.runRate = parseFloat((team2Score.runs / team2Score.overs).toFixed(2));
       }
-      console.log(`Assigned innings ${inningsNum} to team2`);
+      console.log(`Assigned innings ${index + 1} to team2`);
     }
   });
 

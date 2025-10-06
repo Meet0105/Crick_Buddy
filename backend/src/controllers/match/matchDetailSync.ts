@@ -180,7 +180,7 @@ export const syncMatchDetails = async (req: Request, res: Response) => {
       const team2Data = m.matchInfo?.team2 || m.team2;
       
       if (team1Data) {
-        const team1Score = extractTeamScore({ ...m, scorecard }, 'team1');
+        const team1Score = extractTeamScore({ ...m, scorecard, matchScore: m.raw?.matchScore }, 'team1');
         console.log('Extracted team1 score:', JSON.stringify(team1Score, null, 2));
         teams.push({
           teamId: team1Data.teamId?.toString() || team1Data.teamid?.toString() || '',
@@ -191,7 +191,7 @@ export const syncMatchDetails = async (req: Request, res: Response) => {
       }
       
       if (team2Data) {
-        const team2Score = extractTeamScore({ ...m, scorecard }, 'team2');
+        const team2Score = extractTeamScore({ ...m, scorecard, matchScore: m.raw?.matchScore }, 'team2');
         console.log('Extracted team2 score:', JSON.stringify(team2Score, null, 2));
         teams.push({
           teamId: team2Data.teamId?.toString() || team2Data.teamid?.toString() || '',

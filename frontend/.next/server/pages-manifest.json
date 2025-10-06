@@ -1,6 +1,1 @@
-{
-  "/_app": "pages/_app.js",
-  "/_error": "pages/_error.js",
-  "/_document": "pages/_document.js",
-  "/": "pages/index.js"
-}
+{"/_app":"pages/_app.js","/admin/feature-flags":"pages/admin/feature-flags.html","/admin/api-status":"pages/admin/api-status.html","/series/archives":"pages/series/archives.html","/series/list":"pages/series/list.html","/test-api":"pages/test-api.html","/_error":"pages/_error.js","/formats/recent":"pages/formats/recent.js","/formats/odi":"pages/formats/odi.js","/formats/live":"pages/formats/live.js","/formats/test":"pages/formats/test.js","/formats/t20":"pages/formats/t20.js","/formats/upcoming":"pages/formats/upcoming.js","/news/features":"pages/news/features.js","/news/[id]":"pages/news/[id].js","/matches/[id]":"pages/matches/[id].js","/news/category/[id]":"pages/news/category/[id].js","/news/latest":"pages/news/latest.js","/news":"pages/news.js","/news/match-reports":"pages/news/match-reports.js","/players/[id]":"pages/players/[id].js","/players/trending":"pages/players/trending.js","/rankings/women":"pages/rankings/women.js","/players/search":"pages/players/search.js","/rankings":"pages/rankings.js","/records":"pages/records.js","/series/[seriesId]":"pages/series/[seriesId].js","/":"pages/index.js","/teams/[id]":"pages/teams/[id].js","/teams/domestic":"pages/teams/domestic.js","/series":"pages/series.js","/series/archive":"pages/series/archive.js","/venues":"pages/venues.js","/venues/[id]":"pages/venues/[id].js","/teams":"pages/teams.js","/_document":"pages/_document.js","/404":"pages/404.html"}

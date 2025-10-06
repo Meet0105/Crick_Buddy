@@ -29,6 +29,7 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, isLive, isUpcoming, isComp
     // Extract score with comprehensive fallbacks - FIXED to properly check for score object
     let score = { runs: 0, wickets: 0, overs: 0, balls: 0, runRate: 0 };
 
+    // First, try to get score from the team object
     if (team.score && typeof team.score === 'object') {
       score = {
         runs: team.score.runs || 0,
@@ -37,18 +38,105 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, isLive, isUpcoming, isComp
         balls: team.score.balls || 0,
         runRate: team.score.runRate || 0
       };
-    } else if (match?.raw?.matchScore?.[`team${teamIndex + 1}Score`]) {
-      const rawScore = match.raw.matchScore[`team${teamIndex + 1}Score`];
+    } 
+    // Then try to get score from the match teams array directly
+    else if (match?.teams?.[teamIndex]?.score && typeof match.teams[teamIndex].score === 'object') {
+      const teamScore = match.teams[teamIndex].score;
       score = {
-        runs: rawScore.runs || 0,
-        wickets: rawScore.wickets || 0,
-        overs: rawScore.overs || 0,
-        balls: rawScore.balls || 0,
-        runRate: rawScore.runRate || 0
+        runs: teamScore.runs || 0,
+        wickets: teamScore.wickets || 0,
+        overs: teamScore.overs || 0,
+        balls: teamScore.balls || 0,
+        runRate: teamScore.runRate || 0
       };
+    }
+    // Then try to get score from raw matchScore data
+    else if (match?.raw?.matchScore?.[`team${teamIndex + 1}Score`]) {
+      const rawScore = match.raw.matchScore[`team${teamIndex + 1}Score`];
+      
+      // Handle innings-based scoring
+      let totalRuns = 0;
+      let totalWickets = 0;
+      let totalOvers = 0;
+      
+      Object.keys(rawScore).forEach(key => {
+        if (key.startsWith('inngs') || key.startsWith('inning')) {
+          const innings = rawScore[key];
+          totalRuns += innings.runs || 0;
+          // For wickets, we take the latest value (not sum)
+          totalWickets = Math.max(totalWickets, innings.wickets || innings.wkts || 0);
+          totalOvers += innings.overs || 0;
+        }
+      });
+      
+      // If no innings data, try direct fields
+      if (totalRuns === 0 && totalOvers === 0) {
+        totalRuns = rawScore.runs || rawScore.r || 0;
+        totalWickets = rawScore.wickets || rawScore.w || rawScore.wkts || 0;
+        totalOvers = rawScore.overs || rawScore.o || 0;
+      }
+      
+      score = {
+        runs: totalRuns,
+        wickets: totalWickets,
+        overs: totalOvers,
+        balls: rawScore.balls || rawScore.b || 0,
+        runRate: rawScore.runRate || rawScore.rr || 0
+      };
+    }
+    // Try to get score from matchInfo.score
+    else if (match?.raw?.matchInfo?.score?.[`team${teamIndex + 1}Score`]) {
+      const matchInfoScore = match.raw.matchInfo.score[`team${teamIndex + 1}Score`];
+      score = {
+        runs: matchInfoScore.runs || matchInfoScore.r || 0,
+        wickets: matchInfoScore.wickets || matchInfoScore.w || 0,
+        overs: matchInfoScore.overs || matchInfoScore.o || 0,
+        balls: matchInfoScore.balls || matchInfoScore.b || 0,
+        runRate: matchInfoScore.runRate || matchInfoScore.rr || 0
+      };
+    }
+    // Try to get score from the top-level match score object
+    else if (match?.scorecard?.scorecard && Array.isArray(match.scorecard.scorecard)) {
+      // Try to extract score from scorecard data
+      const { team1Score, team2Score } = extractScoresFromScorecard(match.scorecard);
+      if (teamIndex === 0) {
+        score = team1Score;
+      } else if (teamIndex === 1) {
+        score = team2Score;
+      }
     }
 
     return { ...team, teamName, score };
+  };
+
+  // Helper function to extract scores from scorecard data
+  const extractScoresFromScorecard = (scorecardData: any) => {
+    const team1Score = { runs: 0, wickets: 0, overs: 0, balls: 0, runRate: 0 };
+    const team2Score = { runs: 0, wickets: 0, overs: 0, balls: 0, runRate: 0 };
+    
+    if (scorecardData?.scorecard && Array.isArray(scorecardData.scorecard)) {
+      scorecardData.scorecard.forEach((innings: any, index: number) => {
+        // Alternate innings between teams
+        const isTeam1Innings = (index % 2 === 0);
+        
+        // Get runs, wickets, and overs from innings
+        const runs = innings.totalRuns || innings.total || innings.runs || 0;
+        const wickets = innings.totalWickets || innings.wickets || 0;
+        const overs = innings.totalOvers || innings.overs || 0;
+        
+        if (isTeam1Innings) {
+          team1Score.runs += runs;
+          team1Score.wickets = wickets; // Use latest wickets
+          team1Score.overs += overs;
+        } else {
+          team2Score.runs += runs;
+          team2Score.wickets = wickets; // Use latest wickets
+          team2Score.overs += overs;
+        }
+      });
+    }
+    
+    return { team1Score, team2Score };
   };
 
   const team1 = extractTeamData(0);
@@ -59,18 +147,27 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, isLive, isUpcoming, isComp
 
   // Use the scores directly from extracted team data
   const normalizedTeam1Score = {
-    runs: team1.score.runs,
-    wickets: team1.score.wickets,
-    overs: team1.score.overs,
-    runRate: team1.score.runRate
+    runs: team1.score.runs || 0,
+    wickets: team1.score.wickets || 0,
+    overs: team1.score.overs || 0,
+    runRate: team1.score.runRate || 0
   };
 
   const normalizedTeam2Score = {
-    runs: team2.score.runs,
-    wickets: team2.score.wickets,
-    overs: team2.score.overs,
-    runRate: team2.score.runRate
+    runs: team2.score.runs || 0,
+    wickets: team2.score.wickets || 0,
+    overs: team2.score.overs || 0,
+    runRate: team2.score.runRate || 0
   };
+
+  // Debug logging (remove after testing)
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Match:', match?.matchId || 'unknown');
+    console.log('Team1 Score:', normalizedTeam1Score);
+    console.log('Team2 Score:', normalizedTeam2Score);
+    console.log('Team1 raw score:', team1.score);
+    console.log('Team2 raw score:', team2.score);
+  }
 
   // Enhanced title extraction with multiple fallbacks
   const title = match?.title ||

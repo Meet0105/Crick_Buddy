@@ -50,8 +50,10 @@ interface InningsData {
   bowlteam?: string;
   totalRuns?: number;
   total?: number;
+  runs?: number;
   totalWickets?: number;
   wickets?: number;
+  wkts?: number;
   totalOvers?: number;
   overs?: number;
   batsmen?: BatsmanData[];
@@ -60,6 +62,7 @@ interface InningsData {
   bowler?: BowlerData[];
   extras?: ExtrasData;
   fallOfWickets?: string;
+  batsmenData?: { [key: string]: BatsmanData };
   batTeamDetails?: {
     batTeamId?: string;
     batTeamName?: string;
@@ -97,18 +100,52 @@ const MatchScorecard: React.FC<MatchScorecardProps> = ({
       // Historical scorecard format
       batsmen = Object.values(innings.batTeamDetails.batsmenData);
       teamName = innings.batTeamDetails.batTeamName || '';
-      totalRuns = innings.totalRuns || 0;
-      totalWickets = innings.totalWickets || 0;
-      totalOvers = innings.totalOvers || 0;
+      totalRuns = innings.totalRuns || innings.total || 0;
+      totalWickets = innings.totalWickets || innings.wickets || 0;
+      totalOvers = innings.totalOvers || innings.overs || 0;
       extras = innings.extras || {};
     } else if (innings.batsman || innings.batsmen) {
       // Regular scorecard format
       batsmen = innings.batsman || innings.batsmen || [];
       teamName = innings.batTeam || innings.batteam || '';
-      totalRuns = innings.total || innings.totalRuns || 0;
+      // Try multiple sources for runs with proper null checks
+      totalRuns = innings.totalRuns || innings.total || 0;
       totalWickets = innings.wickets || innings.totalWickets || 0;
       totalOvers = innings.overs || innings.totalOvers || 0;
       extras = innings.extras || {};
+    } else {
+      // Fallback: try to extract data from other possible fields
+      teamName = innings.batTeam || innings.batteam || '';
+      totalRuns = innings.totalRuns || innings.total || innings.runs || 0;
+      totalWickets = innings.totalWickets || innings.wickets || innings.wkts || 0;
+      totalOvers = innings.totalOvers || innings.overs || 0;
+      extras = innings.extras || {};
+      
+      // Try to get batsmen data from various possible fields
+      if ((innings as any).batsmenData) {
+        batsmen = Object.values((innings as any).batsmenData);
+      } else if (innings.batTeamDetails?.batsmenData) {
+        batsmen = Object.values(innings.batTeamDetails.batsmenData);
+      }
+    }
+    
+    // If we still don't have batsmen data, try to extract from raw data
+    if (batsmen.length === 0 && match?.raw?.matchScore) {
+      // Try to get batsmen data from matchScore
+      const teamScoreKey = inningsIndex === 0 ? 'team1Score' : 'team2Score';
+      if (match.raw.matchScore[teamScoreKey]) {
+        const teamScore = match.raw.matchScore[teamScoreKey];
+        
+        // Look for batsmen data in innings
+        Object.keys(teamScore).forEach(key => {
+          if (key.startsWith('inngs') || key.startsWith('inning')) {
+            const inningsData = teamScore[key];
+            if (inningsData.batsman || inningsData.batsmen) {
+              batsmen = inningsData.batsman || inningsData.batsmen || [];
+            }
+          }
+        });
+      }
     }
 
     // If team name is still empty, try to get it from match data

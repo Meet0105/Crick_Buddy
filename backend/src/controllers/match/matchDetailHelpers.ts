@@ -46,7 +46,8 @@ export function extractTeamScore(matchData: any, teamKey: string) {
     }
 
     // Try multiple locations for matchScore data (fallback for live matches)
-    const matchScore = matchData.matchScore || matchData.score || matchData.scr || null;
+    // The matchScore might be in different locations
+    const matchScore = matchData.matchScore || matchData.score || matchData.scr || matchData.raw?.matchScore || null;
     
     if (!matchScore) {
       // Try to get score from matchInfo if available

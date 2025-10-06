@@ -10,16 +10,34 @@ const mapStatusToEnum = (status: string): 'UPCOMING' | 'LIVE' | 'COMPLETED' | 'A
   // Convert to lowercase for case-insensitive comparison
   const lowerStatus = status.toLowerCase();
   
-  // Map common status values
-  if (lowerStatus.includes('live') || lowerStatus.includes('in progress')) return 'LIVE';
-  if (lowerStatus.includes('complete') || lowerStatus.includes('finished')) return 'COMPLETED';
-  if (lowerStatus.includes('abandon')) return 'ABANDONED';
-  if (lowerStatus.includes('cancel')) return 'CANCELLED';
+  // Map LIVE status patterns
+  if (lowerStatus.includes('live') || lowerStatus.includes('in progress') || 
+      lowerStatus.includes('innings break') || lowerStatus.includes('rain delay') ||
+      lowerStatus.includes('tea break') || lowerStatus.includes('lunch break') ||
+      lowerStatus.includes('drinks break') || lowerStatus.includes('session')) return 'LIVE';
   
-  // For upcoming matches with date information
-  if (lowerStatus.includes('match starts')) return 'UPCOMING';
+  // Map COMPLETED status patterns
+  if (lowerStatus.includes('complete') || lowerStatus.includes('finished') ||
+      lowerStatus.includes('won') || lowerStatus.includes('lost') ||
+      lowerStatus.includes('draw') || lowerStatus.includes('tied') ||
+      lowerStatus.includes('abandon') || lowerStatus.includes('cancel') ||
+      lowerStatus.includes('no result')) return 'COMPLETED';
   
-  // Default fallback
+  // Map ABANDONED status patterns
+  if (lowerStatus.includes('abandon') || lowerStatus.includes('washed out')) return 'ABANDONED';
+  
+  // Map CANCELLED status patterns
+  if (lowerStatus.includes('cancel') || lowerStatus.includes('postponed')) return 'CANCELLED';
+  
+  // Map UPCOMING status patterns
+  if (lowerStatus.includes('match starts') || lowerStatus.includes('starts at') ||
+      lowerStatus.includes('upcoming') || lowerStatus.includes('scheduled') ||
+      lowerStatus.includes('preview') || lowerStatus.includes('opt to bat') ||
+      lowerStatus.includes('opt to bowl') || lowerStatus.match(/\d{1,2}:\d{2}/) ||
+      lowerStatus.includes('gmt') || lowerStatus.includes('ist') ||
+      lowerStatus.includes('toss') || lowerStatus.includes('day')) return 'UPCOMING';
+  
+  // Default fallback - if it doesn't match any specific pattern, assume upcoming if it has time info
   return 'UPCOMING';
 };
 
@@ -72,9 +90,34 @@ export const getUpcomingMatches = async (req: Request, res: Response) => {
         if (response.data && response.data.typeMatches) {
           console.log('Available match types:', response.data.typeMatches.map((t: any) => t.matchType));
           
-          const upcomingMatchesData = response.data.typeMatches.find((type: any) => 
-            type.matchType === 'Upcoming Matches'
-          );
+          // Look for upcoming matches in any category
+          // The API returns different match types like 'International', 'Domestic', 'Women'
+          // We need to collect matches from all categories that have upcoming matches
+          const allUpcomingMatches = [];
+          
+          for (const typeMatch of response.data.typeMatches) {
+            if (typeMatch.seriesMatches && typeMatch.seriesMatches.length > 0) {
+              // Add all series matches from this category
+              for (const seriesMatch of typeMatch.seriesMatches) {
+                if (seriesMatch.seriesAdWrapper && seriesMatch.seriesAdWrapper.matches) {
+                  allUpcomingMatches.push(...seriesMatch.seriesAdWrapper.matches);
+                }
+              }
+            }
+          }
+          
+          // Create a mock upcomingMatchesData object with all matches
+          const upcomingMatchesData = {
+            seriesMatches: [
+              {
+                seriesAdWrapper: {
+                  matches: allUpcomingMatches
+                }
+              }
+            ]
+          };
+          
+          console.log(`Collected ${allUpcomingMatches.length} matches from all categories`);
           
           console.log('Found Upcoming Matches section:', !!upcomingMatchesData);
 

@@ -222,18 +222,17 @@ export const getLiveMatches = async (req: Request, res: Response) => {
                 status = 'COMPLETED';
               }
 
-              // Check if match should be live based on time (only if not already completed or upcoming)
-              if (status !== 'COMPLETED' && status !== 'UPCOMING') {
-                const matchStartTime = m.matchInfo?.startDate ? new Date(parseInt(m.matchInfo.startDate)) : null;
-                const currentTime = new Date();
-                const shouldBeLive = matchStartTime &&
-                  matchStartTime <= currentTime &&
-                  (currentTime.getTime() - matchStartTime.getTime()) < (8 * 60 * 60 * 1000); // Started within 8 hours
+              // Check if match should be live based on time
+              // Even UPCOMING matches might have started and should be LIVE
+              const matchStartTime = m.matchInfo?.startDate ? new Date(parseInt(m.matchInfo.startDate)) : null;
+              const currentTime = new Date();
+              const shouldBeLive = matchStartTime &&
+                matchStartTime <= currentTime &&
+                (currentTime.getTime() - matchStartTime.getTime()) < (8 * 60 * 60 * 1000); // Started within 8 hours
 
-                if (shouldBeLive) {
-                  console.log(`⚡ Match ${matchId}: Started recently, marking as LIVE`);
-                  status = 'LIVE';
-                }
+              if (status !== 'COMPLETED' && shouldBeLive) {
+                console.log(`⚡ Match ${matchId}: Started recently, marking as LIVE`);
+                status = 'LIVE';
               }
 
               console.log(`Match ${matchId}: rawStatus="${rawStatus}" -> mappedStatus="${status}"`);
@@ -255,7 +254,7 @@ export const getLiveMatches = async (req: Request, res: Response) => {
               else if (m.date) startDate = new Date(m.date);
 
               // Extract score information with comprehensive fallbacks
-              const matchScore = m.matchScore || m.score || {};
+              const matchScore = m.matchScore || m.score || m.raw?.matchScore || {};
               const scoreData = matchScore.scoreData || matchScore;
 
               // Helper function to extract team score
@@ -264,12 +263,33 @@ export const getLiveMatches = async (req: Request, res: Response) => {
                 const scoreFromArray = scoreData[teamIndex] || {};
                 const scoreFromInnings = scoreData[`inngs${teamIndex + 1}`] || {};
                 const scoreFromTeam = teamData.score || {};
+                
+                // Handle innings-based scoring from matchScore
+                let totalRuns = 0;
+                let totalWickets = 0;
+                let totalOvers = 0;
+                let totalBalls = 0;
+                
+                // If we have innings data in matchScore, process it
+                const teamScoreKey = `team${teamIndex + 1}Score`;
+                if (matchScore[teamScoreKey]) {
+                  const teamScore = matchScore[teamScoreKey];
+                  Object.keys(teamScore).forEach(key => {
+                    if (key.startsWith('inngs') || key.startsWith('inng')) {
+                      const innings = teamScore[key];
+                      totalRuns += innings.runs || innings.r || 0;
+                      totalWickets = Math.max(totalWickets, innings.wickets || innings.wkts || innings.w || 0);
+                      totalOvers += innings.overs || innings.o || 0;
+                      totalBalls += innings.balls || innings.b || 0;
+                    }
+                  });
+                }
 
                 return {
-                  runs: scoreFromArray.runs || scoreFromInnings.runs || scoreFromTeam.runs || 0,
-                  wickets: scoreFromArray.wickets || scoreFromInnings.wickets || scoreFromTeam.wickets || 0,
-                  overs: scoreFromArray.overs || scoreFromInnings.overs || scoreFromTeam.overs || 0,
-                  balls: scoreFromArray.balls || scoreFromInnings.balls || scoreFromTeam.balls || 0,
+                  runs: totalRuns || scoreFromArray.runs || scoreFromInnings.runs || scoreFromTeam.runs || 0,
+                  wickets: totalWickets || scoreFromArray.wickets || scoreFromInnings.wickets || scoreFromTeam.wickets || 0,
+                  overs: totalOvers || scoreFromArray.overs || scoreFromInnings.overs || scoreFromTeam.overs || 0,
+                  balls: totalBalls || scoreFromArray.balls || scoreFromInnings.balls || scoreFromTeam.balls || 0,
                   runRate: scoreFromArray.runRate || scoreFromArray.runrate || scoreFromInnings.runRate || scoreFromInnings.runrate || scoreFromTeam.runRate || 0
                 };
               };
@@ -296,7 +316,7 @@ export const getLiveMatches = async (req: Request, res: Response) => {
               // Validate essential match data before saving
               const hasValidTeams = team1Name !== 'Team 1' && team2Name !== 'Team 2' &&
                 team1Name.trim() !== '' && team2Name.trim() !== '';
-              const hasValidId = matchId && matchId.trim() !== '' && matchId !== 'undefined';
+              const hasValidId = matchId && String(matchId).trim() !== '' && matchId !== 'undefined';
 
               if (!hasValidTeams || !hasValidId) {
                 console.log(`⚠️ Skipping match with invalid data: ID=${matchId}, Team1=${team1Name}, Team2=${team2Name}`);
