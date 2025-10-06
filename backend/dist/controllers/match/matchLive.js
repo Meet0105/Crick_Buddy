@@ -110,33 +110,25 @@ const getLiveMatches = async (req, res) => {
                 console.log('✅ API Response received, status:', response.status);
                 // Process API response and save to database
                 if (response.data && response.data.typeMatches) {
-                    console.log('Available match types:', response.data.typeMatches.map((t) => t.matchType));
-                    const liveMatchesData = response.data.typeMatches.find((type) => type.matchType === 'Live Matches');
-                    // Also check for matches that should be live based on time
-                    const allMatches = [];
-                    // Collect all matches from all categories
+                    console.log('✅ Available match types:', response.data.typeMatches.map((t) => t.matchType));
+                    // Don't filter by "Live Matches" - accept ALL match types from live endpoint
+                    // The API returns "Domestic", "Women", "International" etc, not "Live Matches"
+                    const matchesList = [];
+                    // Collect all matches from ALL categories
                     response.data.typeMatches.forEach((typeMatch) => {
+                        console.log(`  Processing category: "${typeMatch.matchType}"`);
                         if (typeMatch.seriesMatches) {
                             typeMatch.seriesMatches.forEach((seriesMatch) => {
                                 if (seriesMatch.seriesAdWrapper && seriesMatch.seriesAdWrapper.matches) {
-                                    allMatches.push(...seriesMatch.seriesAdWrapper.matches);
+                                    matchesList.push(...seriesMatch.seriesAdWrapper.matches);
                                 }
                             });
                         }
                     });
-                    console.log(`Found ${allMatches.length} total matches across all categories`);
-                    const matchesList = [];
-                    if (liveMatchesData && liveMatchesData.seriesMatches) {
-                        // Extract matches from live matches category
-                        for (const seriesMatch of liveMatchesData.seriesMatches) {
-                            if (seriesMatch.seriesAdWrapper && seriesMatch.seriesAdWrapper.matches) {
-                                matchesList.push(...seriesMatch.seriesAdWrapper.matches);
-                            }
-                        }
-                    }
+                    console.log(`✅ Collected ${matchesList.length} total matches from all categories`);
                     // Also check all matches to find ones that should be live based on time
                     const currentTime = new Date();
-                    const potentialLiveMatches = allMatches.filter((match) => {
+                    const potentialLiveMatches = matchesList.filter((match) => {
                         var _a, _b, _c, _d;
                         const matchStartTime = ((_a = match.matchInfo) === null || _a === void 0 ? void 0 : _a.startDate) ? new Date(parseInt(match.matchInfo.startDate)) : null;
                         const rawStatus = ((_b = match.matchInfo) === null || _b === void 0 ? void 0 : _b.status) || ((_c = match.matchInfo) === null || _c === void 0 ? void 0 : _c.state) || match.status || '';

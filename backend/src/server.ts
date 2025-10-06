@@ -74,6 +74,46 @@ app.get('/api/debug/env', (req: Request, res: Response) => {
   });
 });
 
+// Test endpoint to directly call RapidAPI
+app.get('/api/debug/test-api', async (req: Request, res: Response) => {
+  try {
+    const axios = require('axios');
+    const headers = {
+      'x-rapidapi-key': process.env.RAPIDAPI_KEY,
+      'x-rapidapi-host': process.env.RAPIDAPI_HOST
+    };
+    
+    const response = await axios.get(process.env.RAPIDAPI_MATCHES_LIVE_URL, { headers, timeout: 10000 });
+    
+    let matchCount = 0;
+    if (response.data && response.data.typeMatches) {
+      response.data.typeMatches.forEach((tm: any) => {
+        if (tm.seriesMatches) {
+          tm.seriesMatches.forEach((sm: any) => {
+            if (sm.seriesAdWrapper && sm.seriesAdWrapper.matches) {
+              matchCount += sm.seriesAdWrapper.matches.length;
+            }
+          });
+        }
+      });
+    }
+    
+    res.json({
+      success: true,
+      matchCount,
+      status: response.status,
+      message: `Found ${matchCount} matches in RapidAPI`
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      status: error.response?.status,
+      message: 'Failed to call RapidAPI'
+    });
+  }
+});
+
 app.use('/api/matches', matchRoutes);
 app.use('/api/players', playerRoutes);
 app.use('/api/teams', teamRoutes);
