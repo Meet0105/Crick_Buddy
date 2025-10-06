@@ -163,11 +163,16 @@ const MatchScorecard: React.FC<MatchScorecardProps> = ({
       );
     }
 
+    // Debug logging
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`Innings ${inningsIndex + 1}:`, { teamName, totalRuns, totalWickets, totalOvers });
+    }
+
     return (
       <div className="mb-6">
         <div className="bg-gradient-to-r from-green-700 to-green-800 text-white font-bold text-xl p-4 rounded-t-2xl">
           <h4>
-            {teamName} Innings - {totalRuns}/{totalWickets} ({totalOvers} Ov)
+            {teamName} Innings - {Number(totalRuns) || 0}/{Number(totalWickets) || 0} ({Number(totalOvers) || 0} Ov)
           </h4>
         </div>
         
