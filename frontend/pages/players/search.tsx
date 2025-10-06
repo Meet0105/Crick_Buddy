@@ -22,7 +22,7 @@ export default function SearchPlayers({ initialPlayers, query }: { initialPlayer
     
     setLoading(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://crick-buddy-backend-v.vercel.app';
       const res = await axios.get(`${apiUrl}/api/players/search?plrN=${encodeURIComponent(searchTerm)}`);
       const searchResults = Array.isArray(res.data) ? res.data : res.data.players || [];
       setPlayers(searchResults);
@@ -103,7 +103,7 @@ export async function getServerSideProps({ query }: { query: { plrN?: string } }
       return { props: { initialPlayers: [], query } };
     }
     
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://crick-buddy-backend-v.vercel.app';
     const res = await axios.get(`${apiUrl}/api/players/search?plrN=${encodeURIComponent(plrN)}`);
     const players = Array.isArray(res.data) ? res.data : res.data.players || [];
     
