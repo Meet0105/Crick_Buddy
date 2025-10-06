@@ -58,6 +58,18 @@ if (process.env.NODE_ENV !== 'production') {
 app.get('/', (req, res) => {
     res.json({ message: 'Cricket backend (TypeScript) is running' });
 });
+// Debug endpoint to check environment variables
+app.get('/api/debug/env', (req, res) => {
+    res.json({
+        RAPIDAPI_KEY: process.env.RAPIDAPI_KEY ? 'SET (length: ' + process.env.RAPIDAPI_KEY.length + ')' : 'NOT SET',
+        RAPIDAPI_HOST: process.env.RAPIDAPI_HOST ? 'SET' : 'NOT SET',
+        RAPIDAPI_MATCHES_LIVE_URL: process.env.RAPIDAPI_MATCHES_LIVE_URL ? 'SET' : 'NOT SET',
+        RAPIDAPI_MATCHES_INFO_URL: process.env.RAPIDAPI_MATCHES_INFO_URL ? 'SET' : 'NOT SET',
+        MONGO_URI: process.env.MONGO_URI ? 'SET' : 'NOT SET',
+        NODE_ENV: process.env.NODE_ENV || 'NOT SET',
+        timestamp: new Date().toISOString()
+    });
+});
 app.use('/api/matches', matches_1.default);
 app.use('/api/players', players_1.default);
 app.use('/api/teams', teams_1.default);

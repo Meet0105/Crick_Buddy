@@ -72,12 +72,17 @@ const mapStatusToEnum = (status) => {
     return 'LIVE';
 };
 const getLiveMatches = async (req, res) => {
-    var _a;
+    var _a, _b, _c, _d;
     try {
         const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
         const RAPIDAPI_HOST = process.env.RAPIDAPI_HOST;
         const RAPIDAPI_MATCHES_LIVE_URL = process.env.RAPIDAPI_MATCHES_LIVE_URL;
         const RAPIDAPI_MATCHES_INFO_URL = process.env.RAPIDAPI_MATCHES_INFO_URL;
+        // Debug logging
+        console.log('=== getLiveMatches Debug ===');
+        console.log('RAPIDAPI_KEY:', RAPIDAPI_KEY ? `SET (${RAPIDAPI_KEY.substring(0, 10)}...)` : 'NOT SET');
+        console.log('RAPIDAPI_HOST:', RAPIDAPI_HOST || 'NOT SET');
+        console.log('RAPIDAPI_MATCHES_LIVE_URL:', RAPIDAPI_MATCHES_LIVE_URL || 'NOT SET');
         // Clean up stale live matches from database (older than 2 hours)
         try {
             const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
@@ -95,12 +100,14 @@ const getLiveMatches = async (req, res) => {
         // If API key is available, try to fetch from API first
         if (RAPIDAPI_KEY && RAPIDAPI_HOST && RAPIDAPI_MATCHES_LIVE_URL) {
             try {
-                console.log('Fetching live matches from API');
+                console.log('✅ API credentials available, fetching live matches from API');
+                console.log('URL:', RAPIDAPI_MATCHES_LIVE_URL);
                 const headers = {
                     'x-rapidapi-key': RAPIDAPI_KEY,
                     'x-rapidapi-host': RAPIDAPI_HOST
                 };
                 const response = await axios_1.default.get(RAPIDAPI_MATCHES_LIVE_URL, { headers, timeout: 15000 });
+                console.log('✅ API Response received, status:', response.status);
                 // Process API response and save to database
                 if (response.data && response.data.typeMatches) {
                     console.log('Available match types:', response.data.typeMatches.map((t) => t.matchType));
@@ -469,9 +476,23 @@ const getLiveMatches = async (req, res) => {
                 }
             }
             catch (apiError) {
-                console.error('API fetch failed for live matches:', apiError);
+                console.error('❌ API fetch failed for live matches');
+                console.error('Error status:', (_a = apiError.response) === null || _a === void 0 ? void 0 : _a.status);
+                console.error('Error message:', apiError.message);
+                if (((_b = apiError.response) === null || _b === void 0 ? void 0 : _b.status) === 403) {
+                    console.error('403 Forbidden - API key may not be subscribed');
+                }
+                else if (((_c = apiError.response) === null || _c === void 0 ? void 0 : _c.status) === 429) {
+                    console.error('429 Rate Limit - Too many requests');
+                }
                 // Continue to fallback logic
             }
+        }
+        else {
+            console.log('⚠️  API credentials NOT available');
+            console.log('RAPIDAPI_KEY:', RAPIDAPI_KEY ? 'SET' : 'NOT SET');
+            console.log('RAPIDAPI_HOST:', RAPIDAPI_HOST ? 'SET' : 'NOT SET');
+            console.log('RAPIDAPI_MATCHES_LIVE_URL:', RAPIDAPI_MATCHES_LIVE_URL ? 'SET' : 'NOT SET');
         }
         // Get live matches from database with updated scores - with stricter filtering
         const liveMatches = await Match_1.default.find({
@@ -696,7 +717,7 @@ const getLiveMatches = async (req, res) => {
     catch (error) {
         console.error('getLiveMatches error:', error);
         // Handle rate limiting
-        if (((_a = error === null || error === void 0 ? void 0 : error.response) === null || _a === void 0 ? void 0 : _a.status) === 429) {
+        if (((_d = error === null || error === void 0 ? void 0 : error.response) === null || _d === void 0 ? void 0 : _d.status) === 429) {
             // Fallback to database if API rate limit exceeded
             try {
                 const liveMatches = await Match_1.default.find({

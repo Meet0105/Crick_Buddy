@@ -30,6 +30,12 @@ export const getUpcomingMatches = async (req: Request, res: Response) => {
     const RAPIDAPI_HOST = process.env.RAPIDAPI_HOST;
     const RAPIDAPI_MATCHES_UPCOMING_URL = process.env.RAPIDAPI_MATCHES_UPCOMING_URL;
 
+    // Debug logging
+    console.log('=== getUpcomingMatches Debug ===');
+    console.log('RAPIDAPI_KEY:', RAPIDAPI_KEY ? `SET (${RAPIDAPI_KEY.substring(0, 10)}...)` : 'NOT SET');
+    console.log('RAPIDAPI_HOST:', RAPIDAPI_HOST || 'NOT SET');
+    console.log('RAPIDAPI_MATCHES_UPCOMING_URL:', RAPIDAPI_MATCHES_UPCOMING_URL || 'NOT SET');
+
     // Clean up stale upcoming matches from database (older than 6 hours)
     try {
       const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);

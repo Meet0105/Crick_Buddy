@@ -82,6 +82,12 @@ export const getLiveMatches = async (req: Request, res: Response) => {
     const RAPIDAPI_MATCHES_LIVE_URL = process.env.RAPIDAPI_MATCHES_LIVE_URL;
     const RAPIDAPI_MATCHES_INFO_URL = process.env.RAPIDAPI_MATCHES_INFO_URL;
 
+    // Debug logging
+    console.log('=== getLiveMatches Debug ===');
+    console.log('RAPIDAPI_KEY:', RAPIDAPI_KEY ? `SET (${RAPIDAPI_KEY.substring(0, 10)}...)` : 'NOT SET');
+    console.log('RAPIDAPI_HOST:', RAPIDAPI_HOST || 'NOT SET');
+    console.log('RAPIDAPI_MATCHES_LIVE_URL:', RAPIDAPI_MATCHES_LIVE_URL || 'NOT SET');
+
     // Clean up stale live matches from database (older than 2 hours)
     try {
       const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
@@ -99,13 +105,15 @@ export const getLiveMatches = async (req: Request, res: Response) => {
     // If API key is available, try to fetch from API first
     if (RAPIDAPI_KEY && RAPIDAPI_HOST && RAPIDAPI_MATCHES_LIVE_URL) {
       try {
-        console.log('Fetching live matches from API');
+        console.log('✅ API credentials available, fetching live matches from API');
+        console.log('URL:', RAPIDAPI_MATCHES_LIVE_URL);
         const headers = {
           'x-rapidapi-key': RAPIDAPI_KEY,
           'x-rapidapi-host': RAPIDAPI_HOST
         };
 
         const response = await axios.get(RAPIDAPI_MATCHES_LIVE_URL, { headers, timeout: 15000 });
+        console.log('✅ API Response received, status:', response.status);
 
         // Process API response and save to database
         if (response.data && response.data.typeMatches) {
@@ -553,10 +561,22 @@ export const getLiveMatches = async (req: Request, res: Response) => {
             return res.json(validMatches);
           }
         }
-      } catch (apiError) {
-        console.error('API fetch failed for live matches:', apiError);
+      } catch (apiError: any) {
+        console.error('❌ API fetch failed for live matches');
+        console.error('Error status:', apiError.response?.status);
+        console.error('Error message:', apiError.message);
+        if (apiError.response?.status === 403) {
+          console.error('403 Forbidden - API key may not be subscribed');
+        } else if (apiError.response?.status === 429) {
+          console.error('429 Rate Limit - Too many requests');
+        }
         // Continue to fallback logic
       }
+    } else {
+      console.log('⚠️  API credentials NOT available');
+      console.log('RAPIDAPI_KEY:', RAPIDAPI_KEY ? 'SET' : 'NOT SET');
+      console.log('RAPIDAPI_HOST:', RAPIDAPI_HOST ? 'SET' : 'NOT SET');
+      console.log('RAPIDAPI_MATCHES_LIVE_URL:', RAPIDAPI_MATCHES_LIVE_URL ? 'SET' : 'NOT SET');
     }
 
     // Get live matches from database with updated scores - with stricter filtering
