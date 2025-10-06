@@ -18,15 +18,43 @@ const photos_1 = __importDefault(require("./routes/photos"));
 // Load environment variables from the correct path
 dotenv_1.default.config({ path: __dirname + '/../.env' });
 const app = (0, express_1.default)();
+// CORS configuration - allow frontend domains
+const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'https://crick-buddy-frontend-v.vercel.app',
+    'https://crick-buddy-frontend-v-git-main-meets-projects-e0e0e0e0.vercel.app',
+    process.env.FRONTEND_URL
+].filter(Boolean);
 app.use((0, cors_1.default)({
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin)
+            return callback(null, true);
+        if (allowedOrigins.some(allowed => origin.startsWith(allowed))) {
+            callback(null, true);
+        }
+        else {
+            callback(null, true); // Allow all origins for now, restrict later if needed
+        }
+    },
     credentials: true
 }));
 app.use(express_1.default.json({ limit: '2mb' }));
-// Log environment variables for debugging
-console.log('RAPIDAPI_KEY:', process.env.RAPIDAPI_KEY ? 'SET' : 'NOT SET');
-console.log('RAPIDAPI_HOST:', process.env.RAPIDAPI_HOST ? 'SET' : 'NOT SET');
-(0, db_1.default)();
+// Log environment variables for debugging (only in development)
+if (process.env.NODE_ENV !== 'production') {
+    console.log('RAPIDAPI_KEY:', process.env.RAPIDAPI_KEY ? 'SET' : 'NOT SET');
+    console.log('RAPIDAPI_HOST:', process.env.RAPIDAPI_HOST ? 'SET' : 'NOT SET');
+    console.log('MONGO_URI:', process.env.MONGO_URI ? 'SET' : 'NOT SET');
+}
+// Connect to MongoDB with error handling
+(0, db_1.default)().catch(err => {
+    console.error('Failed to connect to MongoDB:', err);
+    // Don't exit in serverless environment
+    if (process.env.NODE_ENV !== 'production') {
+        process.exit(1);
+    }
+});
 app.get('/', (req, res) => {
     res.json({ message: 'Cricket backend (TypeScript) is running' });
 });
@@ -43,9 +71,17 @@ app.use((req, res) => {
 });
 app.use((err, req, res, next) => {
     console.error('Unhandled error:', err);
-    res.status(500).json({ message: 'Internal server error', error: err === null || err === void 0 ? void 0 : err.message });
+    res.status(500).json({
+        message: 'Internal server error',
+        error: process.env.NODE_ENV === 'production' ? 'An error occurred' : err === null || err === void 0 ? void 0 : err.message
+    });
 });
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`🚀 Server listening on port ${PORT}`);
-});
+// For Vercel serverless, export the app
+exports.default = app;
+// For local development, start the server
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`🚀 Server listening on port ${PORT}`);
+    });
+}

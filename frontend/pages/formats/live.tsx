@@ -9,28 +9,28 @@ type Match = any;
 const isActuallyCompleted = (match: any) => {
   const status = match?.status || '';
   const lowerStatus = status.toLowerCase();
-  
+
   // Check for completed status patterns
   return lowerStatus.includes('complete') ||
-         lowerStatus.includes('finished') ||
-         lowerStatus.includes('won') ||
-         lowerStatus.includes('abandon') ||
-         lowerStatus.includes('cancel') ||
-         lowerStatus.includes('no result') ||
-         lowerStatus.includes('tied') ||
-         status === 'COMPLETED' ||
-         status === 'ABANDONED' ||
-         status === 'CANCELLED';
+    lowerStatus.includes('finished') ||
+    lowerStatus.includes('won') ||
+    lowerStatus.includes('abandon') ||
+    lowerStatus.includes('cancel') ||
+    lowerStatus.includes('no result') ||
+    lowerStatus.includes('tied') ||
+    status === 'COMPLETED' ||
+    status === 'ABANDONED' ||
+    status === 'CANCELLED';
 };
 
 export default function LiveMatches({ matches }: { matches: Match[] }) {
   // Filter out completed matches that are incorrectly marked as live
   const filteredMatches = matches.filter((match: any) => !isActuallyCompleted(match));
-  
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
       <Navbar />
-      
+
       <main className="max-w-4xl mx-auto px-4 py-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-100 flex items-center">
@@ -41,7 +41,7 @@ export default function LiveMatches({ matches }: { matches: Match[] }) {
             ← Back to Home
           </Link>
         </div>
-        
+
         <div className="space-y-6">
           {filteredMatches && filteredMatches.length > 0 ? (
             filteredMatches.map((match: any) => (

@@ -29,32 +29,57 @@ const mapStatusToEnum = (status) => {
     return 'UPCOMING';
 };
 const getUpcomingMatches = async (req, res) => {
-    var _a;
+    var _a, _b, _c, _d;
     try {
         const { limit = 10 } = req.query;
         const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
         const RAPIDAPI_HOST = process.env.RAPIDAPI_HOST;
         const RAPIDAPI_MATCHES_UPCOMING_URL = process.env.RAPIDAPI_MATCHES_UPCOMING_URL;
+        // Clean up stale upcoming matches from database (older than 6 hours)
+        try {
+            const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
+            const deleteResult = await Match_1.default.deleteMany({
+                status: 'UPCOMING',
+                updatedAt: { $lt: sixHoursAgo }
+            });
+            if (deleteResult.deletedCount > 0) {
+                console.log(`Deleted ${deleteResult.deletedCount} stale upcoming matches from database`);
+            }
+        }
+        catch (cleanupError) {
+            console.error('Error cleaning up stale upcoming matches:', cleanupError);
+        }
         // If API key is available, try to fetch from API first
         if (RAPIDAPI_KEY && RAPIDAPI_HOST && RAPIDAPI_MATCHES_UPCOMING_URL) {
             try {
-                console.log('Fetching upcoming matches from API');
+                console.log('=== FETCHING UPCOMING MATCHES FROM API ===');
+                console.log('API URL:', RAPIDAPI_MATCHES_UPCOMING_URL);
+                console.log('API Host:', RAPIDAPI_HOST);
+                console.log('API Key present:', !!RAPIDAPI_KEY);
                 const headers = {
                     'x-rapidapi-key': RAPIDAPI_KEY,
                     'x-rapidapi-host': RAPIDAPI_HOST
                 };
                 const response = await axios_1.default.get(RAPIDAPI_MATCHES_UPCOMING_URL, { headers, timeout: 15000 });
+                console.log('API Response Status:', response.status);
+                console.log('API Response has data:', !!response.data);
+                console.log('API Response has typeMatches:', !!((_a = response.data) === null || _a === void 0 ? void 0 : _a.typeMatches));
                 // Process API response and save to database
                 if (response.data && response.data.typeMatches) {
+                    console.log('Available match types:', response.data.typeMatches.map((t) => t.matchType));
                     const upcomingMatchesData = response.data.typeMatches.find((type) => type.matchType === 'Upcoming Matches');
+                    console.log('Found Upcoming Matches section:', !!upcomingMatchesData);
                     if (upcomingMatchesData && upcomingMatchesData.seriesMatches) {
+                        console.log('Number of series with matches:', upcomingMatchesData.seriesMatches.length);
                         const matchesList = [];
                         // Extract matches from series
                         for (const seriesMatch of upcomingMatchesData.seriesMatches) {
                             if (seriesMatch.seriesAdWrapper && seriesMatch.seriesAdWrapper.matches) {
+                                console.log(`Found ${seriesMatch.seriesAdWrapper.matches.length} matches in series`);
                                 matchesList.push(...seriesMatch.seriesAdWrapper.matches);
                             }
                         }
+                        console.log(`Total matches extracted from API: ${matchesList.length}`);
                         // Process and save each match
                         const upsertPromises = matchesList.map(async (m) => {
                             var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y;
@@ -142,64 +167,59 @@ const getUpcomingMatches = async (req, res) => {
                             return Match_1.default.findOneAndUpdate({ matchId: doc.matchId }, { $set: doc }, { upsert: true, new: true, setDefaultsOnInsert: true });
                         });
                         await Promise.all(upsertPromises);
-                        // Return from database after saving
+                        // Return from database after saving - only UPCOMING matches
                         const upcomingMatches = await Match_1.default.find({
-                            $and: [
-                                {
-                                    $or: [
-                                        { status: 'UPCOMING' },
-                                        { status: { $regex: 'upcoming', $options: 'i' } },
-                                        { status: { $regex: 'Upcoming', $options: 'i' } },
-                                        { status: { $regex: 'Scheduled', $options: 'i' } },
-                                        { status: { $regex: 'scheduled', $options: 'i' } },
-                                        {
-                                            startDate: { $gte: new Date() },
-                                            status: { $nin: ['COMPLETED', 'Complete', 'complete', 'Finished', 'finished'] }
-                                        }
-                                    ]
-                                },
-                                {
-                                    status: { $nin: ['LIVE', 'Live', 'live', 'COMPLETED', 'Complete', 'complete', 'Finished', 'finished'] }
-                                }
-                            ]
+                            status: 'UPCOMING',
+                            startDate: { $gte: new Date() } // Only future matches
                         })
                             .sort({ startDate: 1 })
-                            .limit(Number(limit))
-                            .select('matchId title shortTitle teams venue series startDate format status');
-                        return res.json(upcomingMatches);
+                            .limit(Number(limit) * 2) // Get more to filter
+                            .select('matchId title shortTitle teams venue series startDate format status raw');
+                        // Filter out any matches that aren't actually upcoming
+                        const validUpcomingMatches = upcomingMatches.filter(match => {
+                            // Double-check the status
+                            if (match.status !== 'UPCOMING')
+                                return false;
+                            // Check raw data if available
+                            if (match.raw) {
+                                const rawState = (match.raw.state || '').toLowerCase();
+                                const rawStatus = (match.raw.status || '').toLowerCase();
+                                // Skip if raw data indicates it's completed or live
+                                if (rawState.includes('complete') || rawState.includes('live') ||
+                                    rawStatus.includes('complete') || rawStatus.includes('live') ||
+                                    rawState.includes('finished') || rawStatus.includes('won')) {
+                                    return false;
+                                }
+                            }
+                            return true;
+                        }).slice(0, Number(limit)); // Limit after filtering
+                        return res.json(validUpcomingMatches);
                     }
                 }
             }
             catch (apiError) {
-                console.error('API fetch failed for upcoming matches:', apiError);
+                console.error('=== API FETCH FAILED FOR UPCOMING MATCHES ===');
+                console.error('Error message:', apiError.message);
+                console.error('Error response status:', (_b = apiError.response) === null || _b === void 0 ? void 0 : _b.status);
+                console.error('Error response data:', (_c = apiError.response) === null || _c === void 0 ? void 0 : _c.data);
+                console.error('Full error:', apiError);
                 // Continue to fallback logic
             }
         }
-        // Fallback to database if API config is missing or API call failed
+        else {
+            console.log('=== API KEYS NOT CONFIGURED ===');
+            console.log('RAPIDAPI_KEY present:', !!RAPIDAPI_KEY);
+            console.log('RAPIDAPI_HOST present:', !!RAPIDAPI_HOST);
+            console.log('RAPIDAPI_MATCHES_UPCOMING_URL present:', !!RAPIDAPI_MATCHES_UPCOMING_URL);
+        }
+        // Fallback to database if API config is missing or API call failed - only UPCOMING matches
         console.log('Falling back to database for upcoming matches');
         const dbMatches = await Match_1.default.find({
-            $and: [
-                {
-                    $or: [
-                        { status: 'UPCOMING' },
-                        { status: 'Upcoming' },
-                        { status: { $regex: 'upcoming', $options: 'i' } },
-                        { status: { $regex: 'Upcoming', $options: 'i' } },
-                        { status: { $regex: 'Scheduled', $options: 'i' } },
-                        { status: { $regex: 'scheduled', $options: 'i' } },
-                        {
-                            startDate: { $gte: new Date() },
-                            status: { $nin: ['COMPLETED', 'Complete', 'complete', 'Finished', 'finished', 'LIVE', 'Live', 'live'] }
-                        }
-                    ]
-                },
-                {
-                    status: { $nin: ['LIVE', 'Live', 'live', 'COMPLETED', 'Complete', 'complete', 'Finished', 'finished'] }
-                }
-            ]
+            status: 'UPCOMING',
+            startDate: { $gte: new Date() } // Only future matches
         })
             .sort({ startDate: 1 })
-            .limit(Number(limit))
+            .limit(Number(limit) * 2) // Get more to filter
             .select('matchId title shortTitle teams venue series startDate format status raw');
         // Process matches to extract data from raw field if needed
         const processedMatches = dbMatches.map(match => {
@@ -209,34 +229,38 @@ const getUpcomingMatches = async (req, res) => {
             }
             return match;
         });
-        return res.json(processedMatches);
+        // Filter out any non-upcoming matches
+        const validMatches = processedMatches.filter(match => {
+            if (match.status !== 'UPCOMING') {
+                console.log(`Filtering out match ${match.matchId} - status is ${match.status}, not UPCOMING`);
+                return false;
+            }
+            // Check raw data if available
+            if (match.raw) {
+                const rawState = (match.raw.state || '').toLowerCase();
+                const rawStatus = (match.raw.status || '').toLowerCase();
+                if (rawState.includes('complete') || rawState.includes('live') ||
+                    rawStatus.includes('complete') || rawStatus.includes('live') ||
+                    rawState.includes('finished') || rawStatus.includes('won')) {
+                    console.log(`Filtering out match ${match.matchId} - raw data indicates not upcoming`);
+                    return false;
+                }
+            }
+            return true;
+        }).slice(0, Number(limit)); // Limit after filtering
+        console.log(`Returning ${validMatches.length} valid upcoming matches (filtered from ${processedMatches.length})`);
+        return res.json(validMatches);
     }
     catch (error) {
         console.error('getUpcomingMatches error:', error);
         // Handle rate limiting
-        if (((_a = error === null || error === void 0 ? void 0 : error.response) === null || _a === void 0 ? void 0 : _a.status) === 429) {
+        if (((_d = error === null || error === void 0 ? void 0 : error.response) === null || _d === void 0 ? void 0 : _d.status) === 429) {
             // Fallback to database if API rate limit exceeded
             try {
                 const { limit = 10 } = req.query;
                 const upcomingMatches = await Match_1.default.find({
-                    $and: [
-                        {
-                            $or: [
-                                { status: 'UPCOMING' },
-                                { status: { $regex: 'upcoming', $options: 'i' } },
-                                { status: { $regex: 'Upcoming', $options: 'i' } },
-                                { status: { $regex: 'Scheduled', $options: 'i' } },
-                                { status: { $regex: 'scheduled', $options: 'i' } },
-                                {
-                                    startDate: { $gte: new Date() },
-                                    status: { $nin: ['COMPLETED', 'Complete', 'complete', 'Finished', 'finished'] }
-                                }
-                            ]
-                        },
-                        {
-                            status: { $nin: ['LIVE', 'Live', 'live', 'COMPLETED', 'Complete', 'complete', 'Finished', 'finished'] }
-                        }
-                    ]
+                    status: 'UPCOMING',
+                    startDate: { $gte: new Date() }
                 })
                     .sort({ startDate: 1 })
                     .limit(Number(limit))
@@ -251,24 +275,8 @@ const getUpcomingMatches = async (req, res) => {
         try {
             const { limit = 10 } = req.query;
             const upcomingMatches = await Match_1.default.find({
-                $and: [
-                    {
-                        $or: [
-                            { status: 'UPCOMING' },
-                            { status: { $regex: 'upcoming', $options: 'i' } },
-                            { status: { $regex: 'Upcoming', $options: 'i' } },
-                            { status: { $regex: 'Scheduled', $options: 'i' } },
-                            { status: { $regex: 'scheduled', $options: 'i' } },
-                            {
-                                startDate: { $gte: new Date() },
-                                status: { $nin: ['COMPLETED', 'Complete', 'complete', 'Finished', 'finished'] }
-                            }
-                        ]
-                    },
-                    {
-                        status: { $nin: ['LIVE', 'Live', 'live', 'COMPLETED', 'Complete', 'complete', 'Finished', 'finished'] }
-                    }
-                ]
+                status: 'UPCOMING',
+                startDate: { $gte: new Date() }
             })
                 .sort({ startDate: 1 })
                 .limit(Number(limit))
