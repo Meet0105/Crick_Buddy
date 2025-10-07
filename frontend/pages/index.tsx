@@ -98,16 +98,16 @@ export default function Home({ liveMatches, upcomingMatches, recentMatches }: {
           </div>
         </div>
 
-        {/* Neon cricket ball */}
-        <div className="absolute bottom-10 right-10 w-16 h-16 opacity-30">
+        {/* Neon cricket ball - hidden on mobile */}
+        <div className="absolute bottom-4 right-4 sm:bottom-10 sm:right-10 w-12 h-12 sm:w-16 sm:h-16 opacity-30 hidden sm:block">
           <div className="w-full h-full bg-gradient-to-br from-cyan-400 to-violet-500 rounded-full animate-bounce"></div>
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full overflow-hidden">
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8 w-full overflow-hidden">
         {/* Quick Stats Cards */}
-        <section className="mb-12 sm:mb-16 -mt-8 sm:-mt-16 relative z-10">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+        <section className="mb-8 sm:mb-12 md:mb-16 -mt-6 sm:-mt-8 md:-mt-16 relative z-10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-6">
             <div className="group bg-slate-800 rounded-2xl sm:rounded-3xl shadow-xl p-4 sm:p-8 text-center hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-700">
               <div className="relative mb-3 sm:mb-6">
                 <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
@@ -164,38 +164,38 @@ export default function Home({ liveMatches, upcomingMatches, recentMatches }: {
         </section>
 
         {/* Live Matches Section */}
-        <section className="mb-12 sm:mb-16">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-10 gap-4">
-            <div className="flex items-center">
-              <div className="relative hidden sm:block">
-                <div className="w-2 h-12 sm:h-16 bg-gradient-to-b from-red-500 to-red-600 rounded-full mr-4 sm:mr-6"></div>
+        <section className="mb-8 sm:mb-12 md:mb-16">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 md:mb-10 gap-3 sm:gap-4">
+            <div className="flex items-center w-full sm:w-auto">
+              <div className="relative hidden md:block">
+                <div className="w-2 h-12 md:h-16 bg-gradient-to-b from-red-500 to-red-600 rounded-full mr-4 md:mr-6"></div>
                 <div className="absolute top-0 left-0 w-2 h-4 bg-red-400 rounded-full animate-pulse"></div>
               </div>
-              <div>
-                <div className="flex items-center mb-2">
-                  <div className="flex items-center space-x-1 sm:space-x-2 mr-3 sm:mr-4">
-                    <div className="w-3 h-3 sm:w-4 sm:h-4 bg-red-500 rounded-full animate-pulse"></div>
-                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-red-400 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+              <div className="flex-1">
+                <div className="flex items-center mb-1 sm:mb-2">
+                  <div className="flex items-center space-x-1 mr-2 sm:mr-3">
+                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-4 md:h-4 bg-red-500 rounded-full animate-pulse"></div>
+                    <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 bg-red-400 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
                     <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-red-300 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
                   </div>
-                  <span className="bg-red-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold">LIVE</span>
+                  <span className="bg-red-500 text-white px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-bold">LIVE</span>
                 </div>
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-gray-200 mb-1 sm:mb-2">
+                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-gray-200 mb-0.5 sm:mb-1 md:mb-2">
                   Live Cricket Matches
                 </h2>
-                <p className="text-gray-400 text-sm sm:text-base md:text-lg">Experience the thrill of live cricket action</p>
+                <p className="text-gray-400 text-xs sm:text-sm md:text-base lg:text-lg">Experience the thrill of live cricket action</p>
               </div>
             </div>
-            <Link href="/formats/live" className="group w-full sm:w-auto bg-gradient-to-r from-emerald-500 via-cyan-500 to-violet-500 hover:from-emerald-600 hover:via-cyan-600 hover:to-violet-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-bold text-sm sm:text-base md:text-lg transition-all duration-300 transform hover:scale-105 shadow-xl">
+            <Link href="/formats/live" className="group w-full sm:w-auto bg-gradient-to-r from-emerald-500 via-cyan-500 to-violet-500 hover:from-emerald-600 hover:via-cyan-600 hover:to-violet-600 text-white px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm md:text-base lg:text-lg transition-all duration-300 transform hover:scale-105 shadow-xl">
               <span className="flex items-center justify-center">
                 View All Live
-                <svg className="w-4 h-4 sm:w-5 sm:h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 ml-1.5 sm:ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </span>
             </Link>
           </div>
-          <div className="grid gap-6">
+          <div className="grid gap-4 sm:gap-6">
             {liveMatches && liveMatches.length > 0 ? (
               liveMatches
                 .filter((match: any) => {
@@ -217,29 +217,29 @@ export default function Home({ liveMatches, upcomingMatches, recentMatches }: {
                   </Link>
                 ))
             ) : (
-              <div className="bg-slate-800 rounded-3xl shadow-2xl p-16 text-center border border-slate-700">
-                <div className="relative mb-8">
-                  <div className="w-32 h-32 bg-gradient-to-br from-slate-700 to-slate-800 rounded-full flex items-center justify-center mx-auto shadow-inner">
-                    <div className="w-20 h-20 bg-gradient-to-br from-red-900 to-red-800 rounded-full flex items-center justify-center">
-                      <svg className="w-10 h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="bg-slate-800 rounded-2xl sm:rounded-3xl shadow-2xl p-8 sm:p-12 md:p-16 text-center border border-slate-700">
+                <div className="relative mb-6 sm:mb-8">
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-gradient-to-br from-slate-700 to-slate-800 rounded-full flex items-center justify-center mx-auto shadow-inner">
+                    <div className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 bg-gradient-to-br from-red-900 to-red-800 rounded-full flex items-center justify-center">
+                      <svg className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                       </svg>
                     </div>
                   </div>
-                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-lg">⚡</span>
+                  <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm sm:text-base md:text-lg">⚡</span>
                   </div>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-200 mb-4">No Live Matches Right Now</h3>
-                <p className="text-gray-400 mb-8 text-lg max-w-md mx-auto">
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-200 mb-3 sm:mb-4 px-2">No Live Matches Right Now</h3>
+                <p className="text-gray-400 mb-6 sm:mb-8 text-sm sm:text-base md:text-lg max-w-md mx-auto px-4">
                   The cricket world is taking a breather. Check back soon for live action or explore upcoming matches!
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Link href="/formats/upcoming" className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white px-8 py-3 rounded-2xl font-bold transition-all duration-300 transform hover:scale-105 shadow-lg">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-2">
+                  <Link href="/formats/upcoming" className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base transition-all duration-300 transform hover:scale-105 shadow-lg">
                     View Upcoming Matches
                   </Link>
-                  <Link href="/formats/recent" className="bg-slate-700 hover:bg-slate-600 text-gray-200 px-8 py-3 rounded-2xl font-bold transition-all duration-300 transform hover:scale-105 shadow-lg border border-slate-600">
+                  <Link href="/formats/recent" className="bg-slate-700 hover:bg-slate-600 text-gray-200 px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base transition-all duration-300 transform hover:scale-105 shadow-lg border border-slate-600">
                     Recent Results
                   </Link>
                 </div>
@@ -249,35 +249,35 @@ export default function Home({ liveMatches, upcomingMatches, recentMatches }: {
         </section>
 
         {/* Upcoming Matches Section */}
-        <section className="mb-16">
-          <div className="flex items-center justify-between mb-10">
-            <div className="flex items-center">
-              <div className="w-2 h-16 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full mr-6"></div>
-              <div>
-                <div className="flex items-center mb-2">
-                  <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-bold mr-3">UPCOMING</span>
-                  <div className="flex items-center space-x-1">
-                    <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                    <div className="w-2 h-2 bg-blue-300 rounded-full"></div>
-                    <div className="w-2 h-2 bg-blue-200 rounded-full"></div>
+        <section className="mb-8 sm:mb-12 md:mb-16">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 md:mb-10 gap-3 sm:gap-4">
+            <div className="flex items-center w-full sm:w-auto">
+              <div className="w-2 h-12 sm:h-14 md:h-16 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full mr-3 sm:mr-4 md:mr-6 hidden md:block"></div>
+              <div className="flex-1">
+                <div className="flex items-center mb-1 sm:mb-2 flex-wrap gap-2">
+                  <span className="bg-blue-500 text-white px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-bold">UPCOMING</span>
+                  <div className="flex items-center space-x-1 hidden sm:flex">
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-400 rounded-full"></div>
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-300 rounded-full"></div>
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-200 rounded-full"></div>
                   </div>
                 </div>
-                <h2 className="text-4xl font-black text-gray-200 mb-2">
+                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-gray-200 mb-0.5 sm:mb-1 md:mb-2">
                   Upcoming Matches
                 </h2>
-                <p className="text-gray-400 text-lg">Don't miss the upcoming cricket action</p>
+                <p className="text-gray-400 text-xs sm:text-sm md:text-base lg:text-lg">Don't miss the upcoming cricket action</p>
               </div>
             </div>
-            <Link href="/formats/upcoming" className="group bg-gradient-to-r from-emerald-500 via-cyan-500 to-violet-500 hover:from-emerald-600 hover:via-cyan-600 hover:to-violet-600 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-xl">
-              <span className="flex items-center">
+            <Link href="/formats/upcoming" className="group w-full sm:w-auto bg-gradient-to-r from-emerald-500 via-cyan-500 to-violet-500 hover:from-emerald-600 hover:via-cyan-600 hover:to-violet-600 text-white px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm md:text-base lg:text-lg transition-all duration-300 transform hover:scale-105 shadow-xl">
+              <span className="flex items-center justify-center">
                 View All Upcoming
-                <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 ml-1.5 sm:ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </span>
             </Link>
           </div>
-          <div className="grid gap-6">
+          <div className="grid gap-4 sm:gap-6">
             {upcomingMatches && upcomingMatches.length > 0 ? (
               upcomingMatches
                 .filter((match: any) => {
@@ -295,47 +295,47 @@ export default function Home({ liveMatches, upcomingMatches, recentMatches }: {
                   </Link>
                 ))
             ) : (
-              <div className="bg-slate-800 rounded-2xl shadow-lg p-12 text-center border border-slate-700">
-                <div className="w-20 h-20 bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-4xl">📅</span>
+              <div className="bg-slate-800 rounded-xl sm:rounded-2xl shadow-lg p-8 sm:p-10 md:p-12 text-center border border-slate-700">
+                <div className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                  <span className="text-3xl sm:text-4xl">📅</span>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-200 mb-2">No Upcoming Matches</h3>
-                <p className="text-gray-400">Stay tuned for match schedules</p>
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-200 mb-2">No Upcoming Matches</h3>
+                <p className="text-sm sm:text-base text-gray-400">Stay tuned for match schedules</p>
               </div>
             )}
           </div>
         </section>
 
         {/* Recent Matches Section */}
-        <section className="mb-16">
-          <div className="flex items-center justify-between mb-10">
-            <div className="flex items-center">
-              <div className="w-2 h-16 bg-gradient-to-b from-green-500 to-green-600 rounded-full mr-6"></div>
-              <div>
-                <div className="flex items-center mb-2">
-                  <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold mr-3">COMPLETED</span>
-                  <div className="flex items-center space-x-1">
-                    <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+        <section className="mb-8 sm:mb-12 md:mb-16">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 md:mb-10 gap-3 sm:gap-4">
+            <div className="flex items-center w-full sm:w-auto">
+              <div className="w-2 h-12 sm:h-14 md:h-16 bg-gradient-to-b from-green-500 to-green-600 rounded-full mr-3 sm:mr-4 md:mr-6 hidden md:block"></div>
+              <div className="flex-1">
+                <div className="flex items-center mb-1 sm:mb-2 flex-wrap gap-2">
+                  <span className="bg-green-500 text-white px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-bold">COMPLETED</span>
+                  <div className="flex items-center space-x-1 hidden sm:flex">
+                    <svg className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
                   </div>
                 </div>
-                <h2 className="text-4xl font-black text-gray-200 mb-2">
+                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-gray-200 mb-0.5 sm:mb-1 md:mb-2">
                   Recent Results
                 </h2>
-                <p className="text-gray-400 text-lg">Latest match outcomes and highlights</p>
+                <p className="text-gray-400 text-xs sm:text-sm md:text-base lg:text-lg">Latest match outcomes and highlights</p>
               </div>
             </div>
-            <Link href="/formats/recent" className="group bg-gradient-to-r from-emerald-500 via-cyan-500 to-violet-500 hover:from-emerald-600 hover:via-cyan-600 hover:to-violet-600 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-xl">
-              <span className="flex items-center">
+            <Link href="/formats/recent" className="group w-full sm:w-auto bg-gradient-to-r from-emerald-500 via-cyan-500 to-violet-500 hover:from-emerald-600 hover:via-cyan-600 hover:to-violet-600 text-white px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm md:text-base lg:text-lg transition-all duration-300 transform hover:scale-105 shadow-xl">
+              <span className="flex items-center justify-center">
                 View All Results
-                <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 ml-1.5 sm:ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </span>
             </Link>
           </div>
-          <div className="grid gap-6">
+          <div className="grid gap-4 sm:gap-6">
             {recentMatches && recentMatches.length > 0 ? (
               recentMatches
                 .filter((match: any) => {
@@ -383,52 +383,52 @@ export default function Home({ liveMatches, upcomingMatches, recentMatches }: {
         </section>
 
         {/* Quick Access Section */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-200 mb-6 text-center">Quick Access</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <Link href="/news" className="group bg-slate-800 rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-slate-700">
-              <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <span className="text-3xl">📰</span>
+        <section className="mb-8 sm:mb-10 md:mb-12">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-200 mb-4 sm:mb-6 text-center px-4">Quick Access</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+            <Link href="/news" className="group bg-slate-800 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-5 md:p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-slate-700">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-2 sm:mb-3 md:mb-4 group-hover:scale-110 transition-transform">
+                <span className="text-2xl sm:text-2xl md:text-3xl">📰</span>
               </div>
-              <h3 className="font-bold text-gray-200 mb-2">Cricket News</h3>
-              <p className="text-sm text-gray-400">Latest updates & stories</p>
+              <h3 className="font-bold text-gray-200 mb-1 sm:mb-2 text-sm sm:text-base">Cricket News</h3>
+              <p className="text-xs sm:text-sm text-gray-400 hidden sm:block">Latest updates & stories</p>
             </Link>
-            <Link href="/series" className="group bg-slate-800 rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-slate-700">
-              <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-violet-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <span className="text-3xl">🏆</span>
+            <Link href="/series" className="group bg-slate-800 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-5 md:p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-slate-700">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-emerald-500 to-violet-500 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-2 sm:mb-3 md:mb-4 group-hover:scale-110 transition-transform">
+                <span className="text-2xl sm:text-2xl md:text-3xl">🏆</span>
               </div>
-              <h3 className="font-bold text-gray-200 mb-2">Series</h3>
-              <p className="text-sm text-gray-400">Tournaments & leagues</p>
+              <h3 className="font-bold text-gray-200 mb-1 sm:mb-2 text-sm sm:text-base">Series</h3>
+              <p className="text-xs sm:text-sm text-gray-400 hidden sm:block">Tournaments & leagues</p>
             </Link>
-            <Link href="/teams" className="group bg-slate-800 rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-slate-700">
-              <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-violet-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <span className="text-3xl">👥</span>
+            <Link href="/teams" className="group bg-slate-800 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-5 md:p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-slate-700">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-cyan-500 to-violet-500 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-2 sm:mb-3 md:mb-4 group-hover:scale-110 transition-transform">
+                <span className="text-2xl sm:text-2xl md:text-3xl">👥</span>
               </div>
-              <h3 className="font-bold text-gray-200 mb-2">Teams</h3>
-              <p className="text-sm text-gray-400">Squad & player info</p>
+              <h3 className="font-bold text-gray-200 mb-1 sm:mb-2 text-sm sm:text-base">Teams</h3>
+              <p className="text-xs sm:text-sm text-gray-400 hidden sm:block">Squad & player info</p>
             </Link>
-            <Link href="/rankings" className="group bg-slate-800 rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-slate-700">
-              <div className="w-16 h-16 bg-gradient-to-br from-violet-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <span className="text-3xl">📊</span>
+            <Link href="/rankings" className="group bg-slate-800 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-5 md:p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-slate-700">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-violet-500 to-emerald-500 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-2 sm:mb-3 md:mb-4 group-hover:scale-110 transition-transform">
+                <span className="text-2xl sm:text-2xl md:text-3xl">📊</span>
               </div>
-              <h3 className="font-bold text-gray-200 mb-2">Rankings</h3>
-              <p className="text-sm text-gray-400">ICC team & player rankings</p>
+              <h3 className="font-bold text-gray-200 mb-1 sm:mb-2 text-sm sm:text-base">Rankings</h3>
+              <p className="text-xs sm:text-sm text-gray-400 hidden sm:block">ICC team & player rankings</p>
             </Link>
           </div>
         </section>
       </main>
 
       {/* Footer */}
-      <footer className="bg-slate-900 text-gray-200 py-12 border-t border-slate-800">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <footer className="bg-slate-900 text-gray-200 py-8 sm:py-10 md:py-12 border-t border-slate-800 w-full overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
             <div>
-              <h3 className="text-xl font-bold mb-4">CrickBuddy</h3>
-              <p className="text-gray-400">Your ultimate destination for live cricket scores and updates.</p>
+              <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">CrickBuddy</h3>
+              <p className="text-gray-400 text-sm sm:text-base">Your ultimate destination for live cricket scores and updates.</p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Quick Links</h4>
-              <ul className="space-y-2 text-gray-400">
+              <h4 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Quick Links</h4>
+              <ul className="space-y-1.5 sm:space-y-2 text-gray-400 text-sm sm:text-base">
                 <li><Link href="/formats/live" className="hover:text-white transition">Live Scores</Link></li>
                 <li><Link href="/series" className="hover:text-white transition">Series</Link></li>
                 <li><Link href="/teams" className="hover:text-white transition">Teams</Link></li>
@@ -436,8 +436,8 @@ export default function Home({ liveMatches, upcomingMatches, recentMatches }: {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Features</h4>
-              <ul className="space-y-2 text-gray-400">
+              <h4 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Features</h4>
+              <ul className="space-y-1.5 sm:space-y-2 text-gray-400 text-sm sm:text-base">
                 <li><Link href="/news" className="hover:text-white transition">Cricket News</Link></li>
                 <li><Link href="/records" className="hover:text-white transition">Records</Link></li>
                 <li><Link href="/players" className="hover:text-white transition">Player Stats</Link></li>
@@ -445,9 +445,9 @@ export default function Home({ liveMatches, upcomingMatches, recentMatches }: {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Connect</h4>
-              <div className="flex space-x-4">
-                <a href="#" className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-full flex items-center justify-center hover:from-emerald-600 hover:to-cyan-600 transition">
+              <h4 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Connect</h4>
+              <div className="flex space-x-3 sm:space-x-4">
+                <a href="#" className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-full flex items-center justify-center hover:from-emerald-600 hover:to-cyan-600 transition">
                   <span className="text-sm">f</span>
                 </a>
                 <a href="#" className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-full flex items-center justify-center hover:from-cyan-600 hover:to-blue-600 transition">
