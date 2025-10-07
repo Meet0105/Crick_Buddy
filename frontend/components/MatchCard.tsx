@@ -38,7 +38,7 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, isLive, isUpcoming, isComp
         balls: team.score.balls || 0,
         runRate: team.score.runRate || 0
       };
-    } 
+    }
     // Then try to get score from the match teams array directly
     else if (match?.teams?.[teamIndex]?.score && typeof match.teams[teamIndex].score === 'object') {
       const teamScore = match.teams[teamIndex].score;
@@ -53,12 +53,12 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, isLive, isUpcoming, isComp
     // Then try to get score from raw matchScore data
     else if (match?.raw?.matchScore?.[`team${teamIndex + 1}Score`]) {
       const rawScore = match.raw.matchScore[`team${teamIndex + 1}Score`];
-      
+
       // Handle innings-based scoring
       let totalRuns = 0;
       let totalWickets = 0;
       let totalOvers = 0;
-      
+
       Object.keys(rawScore).forEach(key => {
         if (key.startsWith('inngs') || key.startsWith('inning')) {
           const innings = rawScore[key];
@@ -68,14 +68,14 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, isLive, isUpcoming, isComp
           totalOvers += innings.overs || 0;
         }
       });
-      
+
       // If no innings data, try direct fields
       if (totalRuns === 0 && totalOvers === 0) {
         totalRuns = rawScore.runs || rawScore.r || 0;
         totalWickets = rawScore.wickets || rawScore.w || rawScore.wkts || 0;
         totalOvers = rawScore.overs || rawScore.o || 0;
       }
-      
+
       score = {
         runs: totalRuns,
         wickets: totalWickets,
@@ -113,17 +113,17 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, isLive, isUpcoming, isComp
   const extractScoresFromScorecard = (scorecardData: any) => {
     const team1Score = { runs: 0, wickets: 0, overs: 0, balls: 0, runRate: 0 };
     const team2Score = { runs: 0, wickets: 0, overs: 0, balls: 0, runRate: 0 };
-    
+
     if (scorecardData?.scorecard && Array.isArray(scorecardData.scorecard)) {
       scorecardData.scorecard.forEach((innings: any, index: number) => {
         // Alternate innings between teams
         const isTeam1Innings = (index % 2 === 0);
-        
+
         // Get runs, wickets, and overs from innings
         const runs = innings.totalRuns || innings.total || innings.runs || 0;
         const wickets = innings.totalWickets || innings.wickets || 0;
         const overs = innings.totalOvers || innings.overs || 0;
-        
+
         if (isTeam1Innings) {
           team1Score.runs += runs;
           team1Score.wickets = wickets; // Use latest wickets
@@ -135,7 +135,7 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, isLive, isUpcoming, isComp
         }
       });
     }
-    
+
     return { team1Score, team2Score };
   };
 
@@ -159,15 +159,6 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, isLive, isUpcoming, isComp
     overs: team2.score.overs || 0,
     runRate: team2.score.runRate || 0
   };
-
-  // Debug logging (remove after testing)
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Match:', match?.matchId || 'unknown');
-    console.log('Team1 Score:', normalizedTeam1Score);
-    console.log('Team2 Score:', normalizedTeam2Score);
-    console.log('Team1 raw score:', team1.score);
-    console.log('Team2 raw score:', team2.score);
-  }
 
   // Enhanced title extraction with multiple fallbacks
   const title = match?.title ||
@@ -344,6 +335,18 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, isLive, isUpcoming, isComp
     return status || 'UPCOMING';
   };
 
+  // Debug logging (remove after testing)
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Match:', match?.matchId || 'unknown');
+    console.log('Team1 Score:', normalizedTeam1Score);
+    console.log('Team2 Score:', normalizedTeam2Score);
+    console.log('Team1 raw score:', team1.score);
+    console.log('Team2 raw score:', team2.score);
+    console.log('Status:', status);
+    console.log('Actual Is Completed:', actualIsCompleted);
+    console.log('Should Show Scores:', shouldShowScores());
+  }
+
   // Function to construct image URL for team flags
   const getTeamFlagUrl = (team: any) => {
     if (team && team.imageId) {
@@ -380,102 +383,102 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, isLive, isUpcoming, isComp
   );
 
   return (
-    <div className={`bg-slate-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 ${actualIsLive ? 'border-red-500' : actualIsUpcoming ? 'border-blue-500' : 'border-green-500'}`}>
+    <div className={`bg-slate-800 rounded-xl sm:rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 ${actualIsLive ? 'border-red-500' : actualIsUpcoming ? 'border-blue-500' : 'border-green-500'}`}>
 
       {/* Header with match info */}
-      <div className="bg-slate-900 p-5 border-b-2 border-slate-700">
+      <div className="bg-slate-900 p-3 sm:p-5 border-b-2 border-slate-700">
         <div className="flex justify-between items-start">
           <div className="flex-1">
-            <div className="flex items-center mb-2 space-x-2">
+            <div className="flex flex-wrap items-center mb-2 gap-2">
               <StatusBadge text={getStatusText()} icon={statusStyle.icon} bg={statusStyle.bg} />
               <span className="bg-slate-700 text-gray-300 px-2 py-1 rounded-full text-xs font-medium">{format}</span>
             </div>
-            <h3 className="font-bold text-white text-lg mb-1">{title}</h3>
-            <p className="text-gray-300 text-sm">{series}</p>
+            <h3 className="font-bold text-white text-base sm:text-lg mb-1 line-clamp-2">{title}</h3>
+            <p className="text-gray-300 text-xs sm:text-sm line-clamp-1">{series}</p>
           </div>
         </div>
       </div>
 
       {/* Match score details */}
-      <div className="p-5 space-y-4">
+      <div className="p-3 sm:p-5 space-y-3 sm:space-y-4">
         {/* Team 1 */}
-        <div className="flex justify-between items-center">
-          <div className="flex items-center flex-1 space-x-4">
+        <div className="flex justify-between items-center gap-2">
+          <div className="flex items-center flex-1 space-x-2 sm:space-x-4 min-w-0">
             {team1FlagUrl ? (
               <img
                 src={team1FlagUrl}
                 alt={`${team1Name} flag`}
-                className="w-12 h-12 rounded-full object-cover border-2 border-slate-700 shadow-sm"
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-slate-700 shadow-sm flex-shrink-0"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
                 }}
               />
             ) : (
-              <div className="w-12 h-12 rounded-full flex items-center justify-center border-2 border-white shadow-md bg-gradient-to-br from-blue-500 to-blue-700">
-                <span className="text-white font-bold text-sm">{getTeamInitials(team1Name)}</span>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center border-2 border-white shadow-md bg-gradient-to-br from-blue-500 to-blue-700 flex-shrink-0">
+                <span className="text-white font-bold text-xs sm:text-sm">{getTeamInitials(team1Name)}</span>
               </div>
             )}
-            <div>
-              <span className="font-bold text-white text-lg">{team1Name}</span>
+            <div className="min-w-0 flex-1">
+              <span className="font-bold text-white text-sm sm:text-base md:text-lg block truncate">{team1Name}</span>
               {team1.teamShortName && team1.teamShortName !== team1Name && (
-                <span className="text-gray-300 text-sm ml-2">({team1.teamShortName})</span>
+                <span className="text-gray-300 text-xs sm:text-sm hidden sm:inline">({team1.teamShortName})</span>
               )}
             </div>
           </div>
 
           {shouldShowScores() ? (
-            <ScoreBox
-              runs={normalizedTeam1Score.runs}
-              wickets={normalizedTeam1Score.wickets}
-              overs={normalizedTeam1Score.overs}
-              runRate={normalizedTeam1Score.runRate}
-            />
+            <div className="bg-slate-700 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border border-slate-600 shadow-sm text-right flex-shrink-0">
+              <span className="font-bold text-white text-base sm:text-xl">{normalizedTeam1Score.runs}/{normalizedTeam1Score.wickets}</span>
+              <div className="text-gray-300 text-xs sm:text-sm">
+                ({normalizedTeam1Score.overs} ov){normalizedTeam1Score.runRate > 0 && <span className="ml-1 sm:ml-2 hidden sm:inline">RR: {normalizedTeam1Score.runRate.toFixed(2)}</span>}
+              </div>
+            </div>
           ) : (
-            <div className="bg-slate-700 px-4 py-2 rounded-xl border border-slate-600 shadow-sm text-right">
-              <div className="text-gray-300 font-medium text-sm">{matchDate}</div>
-              {matchTime && <div className="text-gray-400 text-xs">{matchTime}</div>}
+            <div className="bg-slate-700 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border border-slate-600 shadow-sm text-right flex-shrink-0">
+              <div className="text-gray-300 font-medium text-xs sm:text-sm">{matchDate}</div>
+              {matchTime && <div className="text-gray-400 text-xs hidden sm:block">{matchTime}</div>}
             </div>
           )}
         </div>
 
         {/* Team 2 */}
-        <div className="flex justify-between items-center">
-          <div className="flex items-center flex-1 space-x-4">
+        <div className="flex justify-between items-center gap-2">
+          <div className="flex items-center flex-1 space-x-2 sm:space-x-4 min-w-0">
             {team2FlagUrl ? (
               <img
                 src={team2FlagUrl}
                 alt={`${team2Name} flag`}
-                className="w-12 h-12 rounded-full object-cover border-2 border-slate-700 shadow-sm"
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-slate-700 shadow-sm flex-shrink-0"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
                 }}
               />
             ) : (
-              <div className="w-12 h-12 rounded-full flex items-center justify-center border-2 border-white shadow-md bg-gradient-to-br from-green-500 to-green-700">
-                <span className="text-white font-bold text-sm">{getTeamInitials(team2Name)}</span>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center border-2 border-white shadow-md bg-gradient-to-br from-green-500 to-green-700 flex-shrink-0">
+                <span className="text-white font-bold text-xs sm:text-sm">{getTeamInitials(team2Name)}</span>
               </div>
             )}
-            <div>
-              <span className="font-bold text-white text-lg">{team2Name}</span>
+            <div className="min-w-0 flex-1">
+              <span className="font-bold text-white text-sm sm:text-base md:text-lg block truncate">{team2Name}</span>
               {team2.teamShortName && team2.teamShortName !== team2Name && (
-                <span className="text-gray-300 text-sm ml-2">({team2.teamShortName})</span>
+                <span className="text-gray-300 text-xs sm:text-sm hidden sm:inline">({team2.teamShortName})</span>
               )}
             </div>
           </div>
 
           {shouldShowScores() ? (
-            <ScoreBox
-              runs={normalizedTeam2Score.runs}
-              wickets={normalizedTeam2Score.wickets}
-              overs={normalizedTeam2Score.overs}
-              runRate={normalizedTeam2Score.runRate}
-            />
+            <div className="bg-slate-700 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border border-slate-600 shadow-sm text-right flex-shrink-0">
+              <span className="font-bold text-white text-base sm:text-xl">{normalizedTeam2Score.runs}/{normalizedTeam2Score.wickets}</span>
+              <div className="text-gray-300 text-xs sm:text-sm">
+                ({normalizedTeam2Score.overs} ov){normalizedTeam2Score.runRate > 0 && <span className="ml-1 sm:ml-2 hidden sm:inline">RR: {normalizedTeam2Score.runRate.toFixed(2)}</span>}
+              </div>
+            </div>
           ) : (
-            <div className="bg-slate-700 px-4 py-2 rounded-xl border border-slate-600 shadow-sm text-right">
-              <div className="text-gray-300 font-medium text-sm">{matchDate}</div>
-              {matchTime && <div className="text-gray-400 text-xs">{matchTime}</div>}
+            <div className="bg-slate-700 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border border-slate-600 shadow-sm text-right flex-shrink-0">
+              <div className="text-gray-300 font-medium text-xs sm:text-sm">{matchDate}</div>
+              {matchTime && <div className="text-gray-400 text-xs hidden sm:block">{matchTime}</div>}
             </div>
           )}
         </div>
@@ -524,7 +527,7 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, isLive, isUpcoming, isComp
         )}
 
         {/* Match result for completed matches */}
-        {actualIsCompleted && status && (status.includes('won') || status.includes('Won')) && (
+        {(actualIsCompleted && (status?.includes('won') || status?.includes('Won'))) ? (
           <div className="mt-4 pt-4 border-t border-slate-700">
             <div className="bg-gradient-to-r from-green-900/30 to-green-800/30 border border-green-700/50 rounded-xl p-4 text-center">
               <div className="flex items-center justify-center">
@@ -537,7 +540,20 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, isLive, isUpcoming, isComp
               </div>
             </div>
           </div>
-        )}
+        ) : (actualIsCompleted && match?.result) ? (
+          <div className="mt-4 pt-4 border-t border-slate-700">
+            <div className="bg-gradient-to-r from-green-900/30 to-green-800/30 border border-green-700/50 rounded-xl p-4 text-center">
+              <div className="flex items-center justify-center">
+                <svg className="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-green-300 font-bold text-sm">
+                  {typeof match.result === 'string' ? match.result : match.result.resultText || 'Match completed'}
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );

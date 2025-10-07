@@ -246,8 +246,8 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Search and User Profile */}
-          <div className="flex items-center space-x-4">
+          {/* Search and User Profile - Hidden on mobile */}
+          <div className="hidden md:flex items-center space-x-4">
             <button className="text-gray-300 hover:text-white transition-colors">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -273,7 +273,7 @@ const Navbar = () => {
 
       {/* Mobile menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-slate-900 border-t border-slate-800">
+        <div className="md:hidden bg-slate-900 border-t border-slate-800 max-h-screen overflow-y-auto">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <Link 
               href="/" 
@@ -387,6 +387,13 @@ const Navbar = () => {
               </svg>
               Records
             </Link>
+
+            {/* Mobile-only buttons */}
+            <div className="border-t border-slate-800 pt-3 mt-3 px-3 space-y-3">
+              <button className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-black font-semibold px-4 py-3 rounded-full text-sm transition-all duration-300 shadow-md">
+                Login
+              </button>
+            </div>
           </div>
         </div>
       )}

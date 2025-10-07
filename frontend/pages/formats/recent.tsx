@@ -45,15 +45,15 @@ export default function RecentMatches({ matches }: { matches: Match[] }) {
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
       <Navbar />
       
-      <main className="max-w-4xl mx-auto px-4 py-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-100">Recent Cricket Matches</h1>
+      <main className="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-100">Recent Cricket Matches</h1>
           <Link href="/" className="text-green-400 hover:text-green-300 text-sm font-medium">
             ← Back to Home
           </Link>
         </div>
         
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {matches && matches.length > 0 ? (
             matches.map((match: any) => {
               // Determine the correct status based on match data
@@ -63,7 +63,7 @@ export default function RecentMatches({ matches }: { matches: Match[] }) {
               
               return (
                 <Link key={match.matchId} href={`/matches/${match.matchId}`}>
-                  <div className="block cursor-pointer mb-6">
+                  <div className="block cursor-pointer mb-4 sm:mb-6">
                     <MatchCard 
                       match={match} 
                       isLive={actuallyLive}
@@ -75,11 +75,11 @@ export default function RecentMatches({ matches }: { matches: Match[] }) {
               );
             })
           ) : (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-8 text-center">
-              <div className="text-5xl mb-4">📚</div>
-              <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">No Recent Matches</h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">There are currently no recent cricket matches available.</p>
-              <Link href="/" className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg inline-block transition">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 sm:p-8 text-center">
+              <div className="text-4xl sm:text-5xl mb-3 sm:mb-4">📚</div>
+              <h3 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">No Recent Matches</h3>
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4">There are currently no recent cricket matches available.</p>
+              <Link href="/" className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg inline-block transition text-sm sm:text-base">
                 View Upcoming Matches
               </Link>
             </div>

@@ -18,95 +18,17 @@ const photos_1 = __importDefault(require("./routes/photos"));
 // Load environment variables from the correct path
 dotenv_1.default.config({ path: __dirname + '/../.env' });
 const app = (0, express_1.default)();
-// CORS configuration - allow frontend domains
-const allowedOrigins = [
-    'http://localhost:3000',
-    'http://localhost:3001',
-    'https://crick-buddy-frontend-v.vercel.app',
-    'https://crick-buddy-frontend-v-git-main-meets-projects-e0e0e0e0.vercel.app',
-    process.env.FRONTEND_URL
-].filter(Boolean);
 app.use((0, cors_1.default)({
-    origin: (origin, callback) => {
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin)
-            return callback(null, true);
-        if (allowedOrigins.some(allowed => origin.startsWith(allowed))) {
-            callback(null, true);
-        }
-        else {
-            callback(null, true); // Allow all origins for now, restrict later if needed
-        }
-    },
+    origin: ['http://localhost:3000', 'http://localhost:3001'],
     credentials: true
 }));
 app.use(express_1.default.json({ limit: '2mb' }));
-// Log environment variables for debugging (only in development)
-if (process.env.NODE_ENV !== 'production') {
-    console.log('RAPIDAPI_KEY:', process.env.RAPIDAPI_KEY ? 'SET' : 'NOT SET');
-    console.log('RAPIDAPI_HOST:', process.env.RAPIDAPI_HOST ? 'SET' : 'NOT SET');
-    console.log('MONGO_URI:', process.env.MONGO_URI ? 'SET' : 'NOT SET');
-}
-// Connect to MongoDB with error handling
-(0, db_1.default)().catch(err => {
-    console.error('Failed to connect to MongoDB:', err);
-    // Don't exit in serverless environment
-    if (process.env.NODE_ENV !== 'production') {
-        process.exit(1);
-    }
-});
+// Log environment variables for debugging
+console.log('RAPIDAPI_KEY:', process.env.RAPIDAPI_KEY ? 'SET' : 'NOT SET');
+console.log('RAPIDAPI_HOST:', process.env.RAPIDAPI_HOST ? 'SET' : 'NOT SET');
+(0, db_1.default)();
 app.get('/', (req, res) => {
     res.json({ message: 'Cricket backend (TypeScript) is running' });
-});
-// Debug endpoint to check environment variables
-app.get('/api/debug/env', (req, res) => {
-    res.json({
-        RAPIDAPI_KEY: process.env.RAPIDAPI_KEY ? 'SET (length: ' + process.env.RAPIDAPI_KEY.length + ')' : 'NOT SET',
-        RAPIDAPI_HOST: process.env.RAPIDAPI_HOST ? 'SET' : 'NOT SET',
-        RAPIDAPI_MATCHES_LIVE_URL: process.env.RAPIDAPI_MATCHES_LIVE_URL ? 'SET' : 'NOT SET',
-        RAPIDAPI_MATCHES_INFO_URL: process.env.RAPIDAPI_MATCHES_INFO_URL ? 'SET' : 'NOT SET',
-        MONGO_URI: process.env.MONGO_URI ? 'SET' : 'NOT SET',
-        NODE_ENV: process.env.NODE_ENV || 'NOT SET',
-        timestamp: new Date().toISOString()
-    });
-});
-// Test endpoint to directly call RapidAPI
-app.get('/api/debug/test-api', async (req, res) => {
-    var _a;
-    try {
-        const axios = require('axios');
-        const headers = {
-            'x-rapidapi-key': process.env.RAPIDAPI_KEY,
-            'x-rapidapi-host': process.env.RAPIDAPI_HOST
-        };
-        const response = await axios.get(process.env.RAPIDAPI_MATCHES_LIVE_URL, { headers, timeout: 10000 });
-        let matchCount = 0;
-        if (response.data && response.data.typeMatches) {
-            response.data.typeMatches.forEach((tm) => {
-                if (tm.seriesMatches) {
-                    tm.seriesMatches.forEach((sm) => {
-                        if (sm.seriesAdWrapper && sm.seriesAdWrapper.matches) {
-                            matchCount += sm.seriesAdWrapper.matches.length;
-                        }
-                    });
-                }
-            });
-        }
-        res.json({
-            success: true,
-            matchCount,
-            status: response.status,
-            message: `Found ${matchCount} matches in RapidAPI`
-        });
-    }
-    catch (error) {
-        res.status(500).json({
-            success: false,
-            error: error.message,
-            status: (_a = error.response) === null || _a === void 0 ? void 0 : _a.status,
-            message: 'Failed to call RapidAPI'
-        });
-    }
 });
 app.use('/api/matches', matches_1.default);
 app.use('/api/players', players_1.default);
@@ -121,17 +43,9 @@ app.use((req, res) => {
 });
 app.use((err, req, res, next) => {
     console.error('Unhandled error:', err);
-    res.status(500).json({
-        message: 'Internal server error',
-        error: process.env.NODE_ENV === 'production' ? 'An error occurred' : err === null || err === void 0 ? void 0 : err.message
-    });
+    res.status(500).json({ message: 'Internal server error', error: err === null || err === void 0 ? void 0 : err.message });
 });
 const PORT = process.env.PORT || 5000;
-// For Vercel serverless, export the app
-exports.default = app;
-// For local development, start the server
-if (process.env.NODE_ENV !== 'production') {
-    app.listen(PORT, () => {
-        console.log(`🚀 Server listening on port ${PORT}`);
-    });
-}
+app.listen(PORT, () => {
+    console.log(`🚀 Server listening on port ${PORT}`);
+});

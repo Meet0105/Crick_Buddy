@@ -82,12 +82,6 @@ export const getLiveMatches = async (req: Request, res: Response) => {
     const RAPIDAPI_MATCHES_LIVE_URL = process.env.RAPIDAPI_MATCHES_LIVE_URL;
     const RAPIDAPI_MATCHES_INFO_URL = process.env.RAPIDAPI_MATCHES_INFO_URL;
 
-    // Debug logging
-    console.log('=== getLiveMatches Debug ===');
-    console.log('RAPIDAPI_KEY:', RAPIDAPI_KEY ? `SET (${RAPIDAPI_KEY.substring(0, 10)}...)` : 'NOT SET');
-    console.log('RAPIDAPI_HOST:', RAPIDAPI_HOST || 'NOT SET');
-    console.log('RAPIDAPI_MATCHES_LIVE_URL:', RAPIDAPI_MATCHES_LIVE_URL || 'NOT SET');
-
     // Clean up stale live matches from database (older than 2 hours)
     try {
       const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
@@ -105,41 +99,52 @@ export const getLiveMatches = async (req: Request, res: Response) => {
     // If API key is available, try to fetch from API first
     if (RAPIDAPI_KEY && RAPIDAPI_HOST && RAPIDAPI_MATCHES_LIVE_URL) {
       try {
-        console.log('✅ API credentials available, fetching live matches from API');
-        console.log('URL:', RAPIDAPI_MATCHES_LIVE_URL);
+        console.log('Fetching live matches from API');
         const headers = {
           'x-rapidapi-key': RAPIDAPI_KEY,
           'x-rapidapi-host': RAPIDAPI_HOST
         };
 
         const response = await axios.get(RAPIDAPI_MATCHES_LIVE_URL, { headers, timeout: 15000 });
-        console.log('✅ API Response received, status:', response.status);
 
         // Process API response and save to database
         if (response.data && response.data.typeMatches) {
-          console.log('✅ Available match types:', response.data.typeMatches.map((t: any) => t.matchType));
+          console.log('Available match types:', response.data.typeMatches.map((t: any) => t.matchType));
 
-          // Don't filter by "Live Matches" - accept ALL match types from live endpoint
-          // The API returns "Domestic", "Women", "International" etc, not "Live Matches"
-          const matchesList: any[] = [];
+          const liveMatchesData = response.data.typeMatches.find((type: any) =>
+            type.matchType === 'Live Matches'
+          );
 
-          // Collect all matches from ALL categories
+          // Also check for matches that should be live based on time
+          const allMatches: any[] = [];
+
+          // Collect all matches from all categories
           response.data.typeMatches.forEach((typeMatch: any) => {
-            console.log(`  Processing category: "${typeMatch.matchType}"`);
             if (typeMatch.seriesMatches) {
               typeMatch.seriesMatches.forEach((seriesMatch: any) => {
                 if (seriesMatch.seriesAdWrapper && seriesMatch.seriesAdWrapper.matches) {
-                  matchesList.push(...seriesMatch.seriesAdWrapper.matches);
+                  allMatches.push(...seriesMatch.seriesAdWrapper.matches);
                 }
               });
             }
           });
 
-          console.log(`✅ Collected ${matchesList.length} total matches from all categories`);
+          console.log(`Found ${allMatches.length} total matches across all categories`);
+
+          const matchesList: any[] = [];
+
+          if (liveMatchesData && liveMatchesData.seriesMatches) {
+            // Extract matches from live matches category
+            for (const seriesMatch of liveMatchesData.seriesMatches) {
+              if (seriesMatch.seriesAdWrapper && seriesMatch.seriesAdWrapper.matches) {
+                matchesList.push(...seriesMatch.seriesAdWrapper.matches);
+              }
+            }
+          }
 
           // Also check all matches to find ones that should be live based on time
           const currentTime = new Date();
-          const potentialLiveMatches = matchesList.filter((match: any) => {
+          const potentialLiveMatches = allMatches.filter((match) => {
             const matchStartTime = match.matchInfo?.startDate ? new Date(parseInt(match.matchInfo.startDate)) : null;
             const rawStatus = match.matchInfo?.status || match.matchInfo?.state || match.status || '';
 
@@ -222,17 +227,18 @@ export const getLiveMatches = async (req: Request, res: Response) => {
                 status = 'COMPLETED';
               }
 
-              // Check if match should be live based on time
-              // Even UPCOMING matches might have started and should be LIVE
-              const matchStartTime = m.matchInfo?.startDate ? new Date(parseInt(m.matchInfo.startDate)) : null;
-              const currentTime = new Date();
-              const shouldBeLive = matchStartTime &&
-                matchStartTime <= currentTime &&
-                (currentTime.getTime() - matchStartTime.getTime()) < (8 * 60 * 60 * 1000); // Started within 8 hours
+              // Check if match should be live based on time (only if not already completed or upcoming)
+              if (status !== 'COMPLETED' && status !== 'UPCOMING') {
+                const matchStartTime = m.matchInfo?.startDate ? new Date(parseInt(m.matchInfo.startDate)) : null;
+                const currentTime = new Date();
+                const shouldBeLive = matchStartTime &&
+                  matchStartTime <= currentTime &&
+                  (currentTime.getTime() - matchStartTime.getTime()) < (8 * 60 * 60 * 1000); // Started within 8 hours
 
-              if (status !== 'COMPLETED' && shouldBeLive) {
-                console.log(`⚡ Match ${matchId}: Started recently, marking as LIVE`);
-                status = 'LIVE';
+                if (shouldBeLive) {
+                  console.log(`⚡ Match ${matchId}: Started recently, marking as LIVE`);
+                  status = 'LIVE';
+                }
               }
 
               console.log(`Match ${matchId}: rawStatus="${rawStatus}" -> mappedStatus="${status}"`);
@@ -254,7 +260,7 @@ export const getLiveMatches = async (req: Request, res: Response) => {
               else if (m.date) startDate = new Date(m.date);
 
               // Extract score information with comprehensive fallbacks
-              const matchScore = m.matchScore || m.score || m.raw?.matchScore || {};
+              const matchScore = m.matchScore || m.score || {};
               const scoreData = matchScore.scoreData || matchScore;
 
               // Helper function to extract team score
@@ -263,33 +269,12 @@ export const getLiveMatches = async (req: Request, res: Response) => {
                 const scoreFromArray = scoreData[teamIndex] || {};
                 const scoreFromInnings = scoreData[`inngs${teamIndex + 1}`] || {};
                 const scoreFromTeam = teamData.score || {};
-                
-                // Handle innings-based scoring from matchScore
-                let totalRuns = 0;
-                let totalWickets = 0;
-                let totalOvers = 0;
-                let totalBalls = 0;
-                
-                // If we have innings data in matchScore, process it
-                const teamScoreKey = `team${teamIndex + 1}Score`;
-                if (matchScore[teamScoreKey]) {
-                  const teamScore = matchScore[teamScoreKey];
-                  Object.keys(teamScore).forEach(key => {
-                    if (key.startsWith('inngs') || key.startsWith('inng')) {
-                      const innings = teamScore[key];
-                      totalRuns += innings.runs || innings.r || 0;
-                      totalWickets = Math.max(totalWickets, innings.wickets || innings.wkts || innings.w || 0);
-                      totalOvers += innings.overs || innings.o || 0;
-                      totalBalls += innings.balls || innings.b || 0;
-                    }
-                  });
-                }
 
                 return {
-                  runs: totalRuns || scoreFromArray.runs || scoreFromInnings.runs || scoreFromTeam.runs || 0,
-                  wickets: totalWickets || scoreFromArray.wickets || scoreFromInnings.wickets || scoreFromTeam.wickets || 0,
-                  overs: totalOvers || scoreFromArray.overs || scoreFromInnings.overs || scoreFromTeam.overs || 0,
-                  balls: totalBalls || scoreFromArray.balls || scoreFromInnings.balls || scoreFromTeam.balls || 0,
+                  runs: scoreFromArray.runs || scoreFromInnings.runs || scoreFromTeam.runs || 0,
+                  wickets: scoreFromArray.wickets || scoreFromInnings.wickets || scoreFromTeam.wickets || 0,
+                  overs: scoreFromArray.overs || scoreFromInnings.overs || scoreFromTeam.overs || 0,
+                  balls: scoreFromArray.balls || scoreFromInnings.balls || scoreFromTeam.balls || 0,
                   runRate: scoreFromArray.runRate || scoreFromArray.runrate || scoreFromInnings.runRate || scoreFromInnings.runrate || scoreFromTeam.runRate || 0
                 };
               };
@@ -316,7 +301,7 @@ export const getLiveMatches = async (req: Request, res: Response) => {
               // Validate essential match data before saving
               const hasValidTeams = team1Name !== 'Team 1' && team2Name !== 'Team 2' &&
                 team1Name.trim() !== '' && team2Name.trim() !== '';
-              const hasValidId = matchId && String(matchId).trim() !== '' && matchId !== 'undefined';
+              const hasValidId = matchId && matchId.trim() !== '' && matchId !== 'undefined';
 
               if (!hasValidTeams || !hasValidId) {
                 console.log(`⚠️ Skipping match with invalid data: ID=${matchId}, Team1=${team1Name}, Team2=${team2Name}`);
@@ -568,22 +553,10 @@ export const getLiveMatches = async (req: Request, res: Response) => {
             return res.json(validMatches);
           }
         }
-      } catch (apiError: any) {
-        console.error('❌ API fetch failed for live matches');
-        console.error('Error status:', apiError.response?.status);
-        console.error('Error message:', apiError.message);
-        if (apiError.response?.status === 403) {
-          console.error('403 Forbidden - API key may not be subscribed');
-        } else if (apiError.response?.status === 429) {
-          console.error('429 Rate Limit - Too many requests');
-        }
+      } catch (apiError) {
+        console.error('API fetch failed for live matches:', apiError);
         // Continue to fallback logic
       }
-    } else {
-      console.log('⚠️  API credentials NOT available');
-      console.log('RAPIDAPI_KEY:', RAPIDAPI_KEY ? 'SET' : 'NOT SET');
-      console.log('RAPIDAPI_HOST:', RAPIDAPI_HOST ? 'SET' : 'NOT SET');
-      console.log('RAPIDAPI_MATCHES_LIVE_URL:', RAPIDAPI_MATCHES_LIVE_URL ? 'SET' : 'NOT SET');
     }
 
     // Get live matches from database with updated scores - with stricter filtering

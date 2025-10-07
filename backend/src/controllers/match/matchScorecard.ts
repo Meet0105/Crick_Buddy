@@ -199,34 +199,6 @@ export const getMatchScorecard = async (req: Request, res: Response) => {
     // Store scorecard data in database
     if (response.data && matchFromDB) {
       console.log('Storing scorecard data in database');
-      
-      // Process scorecard innings to add missing fields
-      if (response.data.scorecard && Array.isArray(response.data.scorecard)) {
-        response.data.scorecard = response.data.scorecard.map((innings: any, index: number) => {
-          // Calculate total runs from batsman array + extras
-          let totalRuns = 0;
-          if (innings.batsman && Array.isArray(innings.batsman)) {
-            totalRuns = innings.batsman.reduce((sum: number, batsman: any) => sum + (batsman.runs || 0), 0);
-          }
-          if (innings.extras && innings.extras.total) {
-            totalRuns += innings.extras.total;
-          }
-          
-          // Determine batting team based on innings number
-          // Innings 1 & 3 = team1, Innings 2 & 4 = team2 (typically)
-          let batTeam = '';
-          if (matchFromDB.teams && matchFromDB.teams.length >= 2) {
-            batTeam = (index % 2 === 0) ? matchFromDB.teams[0].teamName : matchFromDB.teams[1].teamName;
-          }
-          
-          return {
-            ...innings,
-            totalRuns,
-            batTeam
-          };
-        });
-      }
-      
       matchFromDB.scorecard = response.data;
       await saveMatchWithRetry(matchFromDB);
     } else if (response.data && !matchFromDB) {
