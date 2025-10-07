@@ -8,36 +8,36 @@ type Match = any;
 // Helper function to determine if a match is actually live
 const isActuallyLive = (match: any) => {
   if (match.isLive) return true;
-  
+
   const status = match?.status || '';
   const lowerStatus = status.toLowerCase();
-  
+
   // Check for live status patterns
   return lowerStatus.includes('live') ||
-         lowerStatus.includes('in progress') ||
-         lowerStatus.includes('innings break') ||
-         lowerStatus.includes('rain delay') ||
-         lowerStatus.includes('tea break') ||
-         lowerStatus.includes('lunch break') ||
-         lowerStatus.includes('drinks break');
+    lowerStatus.includes('in progress') ||
+    lowerStatus.includes('innings break') ||
+    lowerStatus.includes('rain delay') ||
+    lowerStatus.includes('tea break') ||
+    lowerStatus.includes('lunch break') ||
+    lowerStatus.includes('drinks break');
 };
 
 // Helper function to determine if a match is actually completed
 const isActuallyCompleted = (match: any) => {
   const status = match?.status || '';
   const lowerStatus = status.toLowerCase();
-  
+
   // Check for completed status patterns
   return lowerStatus.includes('complete') ||
-         lowerStatus.includes('finished') ||
-         lowerStatus.includes('won') ||
-         lowerStatus.includes('abandon') ||
-         lowerStatus.includes('cancel') ||
-         lowerStatus.includes('no result') ||
-         lowerStatus.includes('tied') ||
-         status === 'COMPLETED' ||
-         status === 'ABANDONED' ||
-         status === 'CANCELLED';
+    lowerStatus.includes('finished') ||
+    lowerStatus.includes('won') ||
+    lowerStatus.includes('abandon') ||
+    lowerStatus.includes('cancel') ||
+    lowerStatus.includes('no result') ||
+    lowerStatus.includes('tied') ||
+    status === 'COMPLETED' ||
+    status === 'ABANDONED' ||
+    status === 'CANCELLED';
 };
 
 export default function Home({ liveMatches, upcomingMatches, recentMatches }: {
@@ -106,90 +106,90 @@ export default function Home({ liveMatches, upcomingMatches, recentMatches }: {
 
       <main className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8 w-full overflow-hidden">
         {/* Quick Stats Cards */}
-        <section className="mb-8 sm:mb-12 md:mb-16 -mt-6 sm:-mt-8 md:-mt-16 relative z-10">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-6">
-            <div className="group bg-slate-800 rounded-2xl sm:rounded-3xl shadow-xl p-4 sm:p-8 text-center hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-700">
-              <div className="relative mb-3 sm:mb-6">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <div className="w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full animate-pulse"></div>
+        <section className="mb-8 sm:mb-12 lg:mb-16 -mt-6 sm:-mt-8 lg:-mt-16 relative z-10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+            <div className="group bg-slate-800 rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-xl p-3 sm:p-6 lg:p-8 text-center hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-700">
+              <div className="relative mb-2 sm:mb-4 lg:mb-6">
+                <div className="w-10 h-10 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-lg sm:rounded-xl lg:rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <div className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 lg:w-3 lg:h-3 bg-white rounded-full animate-pulse"></div>
                 </div>
-                <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-5 h-5 sm:w-6 sm:h-6 bg-red-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">{liveMatches?.length || 0}</span>
+                <div className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 lg:-top-2 lg:-right-2 w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 bg-red-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-[10px] sm:text-xs font-bold">{liveMatches?.length || 0}</span>
                 </div>
               </div>
-              <h3 className="text-2xl sm:text-3xl font-black text-gray-200 mb-1 sm:mb-2">{liveMatches?.length || 0}</h3>
-              <p className="text-gray-400 font-semibold text-sm sm:text-lg">Live Now</p>
-              <div className="mt-2 sm:mt-4 h-1 bg-gradient-to-r from-red-500 to-red-600 rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+              <h3 className="text-xl sm:text-2xl lg:text-3xl font-black text-gray-200 mb-0.5 sm:mb-1 lg:mb-2">{liveMatches?.length || 0}</h3>
+              <p className="text-gray-400 font-semibold text-xs sm:text-sm lg:text-lg">Live Now</p>
+              <div className="mt-1.5 sm:mt-3 lg:mt-4 h-0.5 lg:h-1 bg-gradient-to-r from-red-500 to-red-600 rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
             </div>
 
-            <div className="group bg-slate-800 rounded-2xl sm:rounded-3xl shadow-xl p-4 sm:p-8 text-center hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-700">
-              <div className="relative mb-3 sm:mb-6">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="group bg-slate-800 rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-xl p-3 sm:p-6 lg:p-8 text-center hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-700">
+              <div className="relative mb-2 sm:mb-4 lg:mb-6">
+                <div className="w-10 h-10 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg sm:rounded-xl lg:rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-5 h-5 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </div>
               </div>
-              <h3 className="text-2xl sm:text-3xl font-black text-gray-200 mb-1 sm:mb-2">{upcomingMatches?.length || 0}</h3>
-              <p className="text-gray-400 font-semibold text-sm sm:text-lg">Upcoming</p>
-              <div className="mt-2 sm:mt-4 h-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+              <h3 className="text-xl sm:text-2xl lg:text-3xl font-black text-gray-200 mb-0.5 sm:mb-1 lg:mb-2">{upcomingMatches?.length || 0}</h3>
+              <p className="text-gray-400 font-semibold text-xs sm:text-sm lg:text-lg">Upcoming</p>
+              <div className="mt-1.5 sm:mt-3 lg:mt-4 h-0.5 lg:h-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
             </div>
 
-            <div className="group bg-slate-800 rounded-2xl sm:rounded-3xl shadow-xl p-4 sm:p-8 text-center hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-700">
-              <div className="relative mb-3 sm:mb-6">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="group bg-slate-800 rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-xl p-3 sm:p-6 lg:p-8 text-center hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-700">
+              <div className="relative mb-2 sm:mb-4 lg:mb-6">
+                <div className="w-10 h-10 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-lg sm:rounded-xl lg:rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-5 h-5 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
               </div>
-              <h3 className="text-2xl sm:text-3xl font-black text-gray-200 mb-1 sm:mb-2">{recentMatches?.length || 0}</h3>
-              <p className="text-gray-400 font-semibold text-sm sm:text-lg">Completed</p>
-              <div className="mt-2 sm:mt-4 h-1 bg-gradient-to-r from-green-500 to-green-600 rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+              <h3 className="text-xl sm:text-2xl lg:text-3xl font-black text-gray-200 mb-0.5 sm:mb-1 lg:mb-2">{recentMatches?.length || 0}</h3>
+              <p className="text-gray-400 font-semibold text-xs sm:text-sm lg:text-lg">Completed</p>
+              <div className="mt-1.5 sm:mt-3 lg:mt-4 h-0.5 lg:h-1 bg-gradient-to-r from-green-500 to-green-600 rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
             </div>
 
-            <div className="group bg-slate-800 rounded-2xl sm:rounded-3xl shadow-xl p-4 sm:p-8 text-center hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-700">
-              <div className="relative mb-3 sm:mb-6">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="group bg-slate-800 rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-xl p-3 sm:p-6 lg:p-8 text-center hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-700">
+              <div className="relative mb-2 sm:mb-4 lg:mb-6">
+                <div className="w-10 h-10 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg sm:rounded-xl lg:rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-5 h-5 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                   </svg>
                 </div>
               </div>
-              <h3 className="text-2xl sm:text-3xl font-black text-gray-200 mb-1 sm:mb-2">12</h3>
-              <p className="text-gray-400 font-semibold text-sm sm:text-lg">Active Series</p>
-              <div className="mt-2 sm:mt-4 h-1 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+              <h3 className="text-xl sm:text-2xl lg:text-3xl font-black text-gray-200 mb-0.5 sm:mb-1 lg:mb-2">12</h3>
+              <p className="text-gray-400 font-semibold text-xs sm:text-sm lg:text-lg">Active Series</p>
+              <div className="mt-1.5 sm:mt-3 lg:mt-4 h-0.5 lg:h-1 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
             </div>
           </div>
         </section>
 
         {/* Live Matches Section */}
-        <section className="mb-8 sm:mb-12 md:mb-16">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 md:mb-10 gap-3 sm:gap-4">
+        <section className="mb-8 sm:mb-12 lg:mb-16">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 lg:mb-10 gap-3 sm:gap-4">
             <div className="flex items-center w-full sm:w-auto">
-              <div className="relative hidden md:block">
-                <div className="w-2 h-12 md:h-16 bg-gradient-to-b from-red-500 to-red-600 rounded-full mr-4 md:mr-6"></div>
+              <div className="relative hidden sm:block">
+                <div className="w-2 h-12 sm:h-14 lg:h-16 bg-gradient-to-b from-red-500 to-red-600 rounded-full mr-3 sm:mr-4 lg:mr-6"></div>
                 <div className="absolute top-0 left-0 w-2 h-4 bg-red-400 rounded-full animate-pulse"></div>
               </div>
               <div className="flex-1">
                 <div className="flex items-center mb-1 sm:mb-2">
-                  <div className="flex items-center space-x-1 mr-2 sm:mr-3">
-                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-4 md:h-4 bg-red-500 rounded-full animate-pulse"></div>
-                    <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 bg-red-400 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+                  <div className="flex items-center space-x-1 sm:space-x-2 mr-2 sm:mr-3 lg:mr-4">
+                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 lg:w-4 lg:h-4 bg-red-500 rounded-full animate-pulse"></div>
+                    <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 lg:w-3 lg:h-3 bg-red-400 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
                     <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-red-300 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
                   </div>
                   <span className="bg-red-500 text-white px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-bold">LIVE</span>
                 </div>
-                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-gray-200 mb-0.5 sm:mb-1 md:mb-2">
+                <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-gray-200 mb-1 sm:mb-2">
                   Live Cricket Matches
                 </h2>
-                <p className="text-gray-400 text-xs sm:text-sm md:text-base lg:text-lg">Experience the thrill of live cricket action</p>
+                <p className="text-gray-400 text-xs sm:text-sm lg:text-base xl:text-lg">Experience the thrill of live cricket action</p>
               </div>
             </div>
-            <Link href="/formats/live" className="group w-full sm:w-auto bg-gradient-to-r from-emerald-500 via-cyan-500 to-violet-500 hover:from-emerald-600 hover:via-cyan-600 hover:to-violet-600 text-white px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm md:text-base lg:text-lg transition-all duration-300 transform hover:scale-105 shadow-xl">
+            <Link href="/formats/live" className="group w-full sm:w-auto bg-gradient-to-r from-emerald-500 via-cyan-500 to-violet-500 hover:from-emerald-600 hover:via-cyan-600 hover:to-violet-600 text-white px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3 lg:py-4 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm lg:text-base xl:text-lg transition-all duration-300 transform hover:scale-105 shadow-xl">
               <span className="flex items-center justify-center">
                 View All Live
-                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 ml-1.5 sm:ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 ml-1.5 sm:ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </span>
@@ -201,12 +201,12 @@ export default function Home({ liveMatches, upcomingMatches, recentMatches }: {
                 .filter((match: any) => {
                   // Filter out matches with completely missing essential data
                   const hasValidTeams = (match?.teams && match.teams.length >= 2) ||
-                                       (match?.raw?.matchInfo?.team1 && match?.raw?.matchInfo?.team2);
+                    (match?.raw?.matchInfo?.team1 && match?.raw?.matchInfo?.team2);
                   const hasValidId = match?.matchId || match?._id;
-                  
+
                   // Filter out completed matches that are incorrectly marked as live
                   const isCompleted = isActuallyCompleted(match);
-                  
+
                   return hasValidTeams && hasValidId && !isCompleted;
                 })
                 .map((match: any) => (
@@ -249,10 +249,10 @@ export default function Home({ liveMatches, upcomingMatches, recentMatches }: {
         </section>
 
         {/* Upcoming Matches Section */}
-        <section className="mb-8 sm:mb-12 md:mb-16">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 md:mb-10 gap-3 sm:gap-4">
+        <section className="mb-8 sm:mb-12 lg:mb-16">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 lg:mb-10 gap-3 sm:gap-4">
             <div className="flex items-center w-full sm:w-auto">
-              <div className="w-2 h-12 sm:h-14 md:h-16 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full mr-3 sm:mr-4 md:mr-6 hidden md:block"></div>
+              <div className="w-2 h-12 sm:h-14 lg:h-16 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full mr-3 sm:mr-4 lg:mr-6 hidden sm:block"></div>
               <div className="flex-1">
                 <div className="flex items-center mb-1 sm:mb-2 flex-wrap gap-2">
                   <span className="bg-blue-500 text-white px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-bold">UPCOMING</span>
@@ -262,16 +262,16 @@ export default function Home({ liveMatches, upcomingMatches, recentMatches }: {
                     <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-200 rounded-full"></div>
                   </div>
                 </div>
-                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-gray-200 mb-0.5 sm:mb-1 md:mb-2">
+                <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-gray-200 mb-1 sm:mb-2">
                   Upcoming Matches
                 </h2>
-                <p className="text-gray-400 text-xs sm:text-sm md:text-base lg:text-lg">Don't miss the upcoming cricket action</p>
+                <p className="text-gray-400 text-xs sm:text-sm lg:text-base xl:text-lg">Don't miss the upcoming cricket action</p>
               </div>
             </div>
-            <Link href="/formats/upcoming" className="group w-full sm:w-auto bg-gradient-to-r from-emerald-500 via-cyan-500 to-violet-500 hover:from-emerald-600 hover:via-cyan-600 hover:to-violet-600 text-white px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm md:text-base lg:text-lg transition-all duration-300 transform hover:scale-105 shadow-xl">
+            <Link href="/formats/upcoming" className="group w-full sm:w-auto bg-gradient-to-r from-emerald-500 via-cyan-500 to-violet-500 hover:from-emerald-600 hover:via-cyan-600 hover:to-violet-600 text-white px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3 lg:py-4 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm lg:text-base xl:text-lg transition-all duration-300 transform hover:scale-105 shadow-xl">
               <span className="flex items-center justify-center">
                 View All Upcoming
-                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 ml-1.5 sm:ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 ml-1.5 sm:ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </span>
@@ -283,7 +283,7 @@ export default function Home({ liveMatches, upcomingMatches, recentMatches }: {
                 .filter((match: any) => {
                   // Filter out matches with completely missing essential data
                   const hasValidTeams = (match?.teams && match.teams.length >= 2) ||
-                                       (match?.raw?.matchInfo?.team1 && match?.raw?.matchInfo?.team2);
+                    (match?.raw?.matchInfo?.team1 && match?.raw?.matchInfo?.team2);
                   const hasValidId = match?.matchId || match?._id;
                   return hasValidTeams && hasValidId;
                 })
@@ -307,10 +307,10 @@ export default function Home({ liveMatches, upcomingMatches, recentMatches }: {
         </section>
 
         {/* Recent Matches Section */}
-        <section className="mb-8 sm:mb-12 md:mb-16">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 md:mb-10 gap-3 sm:gap-4">
+        <section className="mb-8 sm:mb-12 lg:mb-16">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 lg:mb-10 gap-3 sm:gap-4">
             <div className="flex items-center w-full sm:w-auto">
-              <div className="w-2 h-12 sm:h-14 md:h-16 bg-gradient-to-b from-green-500 to-green-600 rounded-full mr-3 sm:mr-4 md:mr-6 hidden md:block"></div>
+              <div className="w-2 h-12 sm:h-14 lg:h-16 bg-gradient-to-b from-green-500 to-green-600 rounded-full mr-3 sm:mr-4 lg:mr-6 hidden sm:block"></div>
               <div className="flex-1">
                 <div className="flex items-center mb-1 sm:mb-2 flex-wrap gap-2">
                   <span className="bg-green-500 text-white px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-bold">COMPLETED</span>
@@ -320,16 +320,16 @@ export default function Home({ liveMatches, upcomingMatches, recentMatches }: {
                     </svg>
                   </div>
                 </div>
-                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-gray-200 mb-0.5 sm:mb-1 md:mb-2">
+                <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-gray-200 mb-1 sm:mb-2">
                   Recent Results
                 </h2>
-                <p className="text-gray-400 text-xs sm:text-sm md:text-base lg:text-lg">Latest match outcomes and highlights</p>
+                <p className="text-gray-400 text-xs sm:text-sm lg:text-base xl:text-lg">Latest match outcomes and highlights</p>
               </div>
             </div>
-            <Link href="/formats/recent" className="group w-full sm:w-auto bg-gradient-to-r from-emerald-500 via-cyan-500 to-violet-500 hover:from-emerald-600 hover:via-cyan-600 hover:to-violet-600 text-white px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm md:text-base lg:text-lg transition-all duration-300 transform hover:scale-105 shadow-xl">
+            <Link href="/formats/recent" className="group w-full sm:w-auto bg-gradient-to-r from-emerald-500 via-cyan-500 to-violet-500 hover:from-emerald-600 hover:via-cyan-600 hover:to-violet-600 text-white px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3 lg:py-4 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm lg:text-base xl:text-lg transition-all duration-300 transform hover:scale-105 shadow-xl">
               <span className="flex items-center justify-center">
                 View All Results
-                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 ml-1.5 sm:ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 ml-1.5 sm:ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </span>
@@ -341,20 +341,20 @@ export default function Home({ liveMatches, upcomingMatches, recentMatches }: {
                 .filter((match: any) => {
                   // Filter out matches with completely missing essential data
                   const hasValidTeams = (match?.teams && match.teams.length >= 2) ||
-                                       (match?.raw?.matchInfo?.team1 && match?.raw?.matchInfo?.team2);
+                    (match?.raw?.matchInfo?.team1 && match?.raw?.matchInfo?.team2);
                   const hasValidId = match?.matchId || match?._id;
                   return hasValidTeams && hasValidId;
                 })
                 .map((match: any) => {
                   const matchActuallyLive = isActuallyLive(match);
-                  const matchActuallyCompleted = isActuallyCompleted(match) || 
-                                    match.status === 'Complete' || 
-                                    match.status === 'COMPLETED' || 
-                                    match.status === 'ABANDONED' || 
-                                    match.status === 'CANCELLED' || 
-                                    match.status.includes('won') || 
-                                    match.status.includes('Win') || 
-                                    match.status.includes('win');
+                  const matchActuallyCompleted = isActuallyCompleted(match) ||
+                    match.status === 'Complete' ||
+                    match.status === 'COMPLETED' ||
+                    match.status === 'ABANDONED' ||
+                    match.status === 'CANCELLED' ||
+                    match.status.includes('won') ||
+                    match.status.includes('Win') ||
+                    match.status.includes('win');
                   const matchActuallyUpcoming = !matchActuallyLive && !matchActuallyCompleted;
 
                   return (
@@ -383,33 +383,33 @@ export default function Home({ liveMatches, upcomingMatches, recentMatches }: {
         </section>
 
         {/* Quick Access Section */}
-        <section className="mb-8 sm:mb-10 md:mb-12">
+        <section className="mb-8 sm:mb-10 lg:mb-12">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-200 mb-4 sm:mb-6 text-center px-4">Quick Access</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-            <Link href="/news" className="group bg-slate-800 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-5 md:p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-slate-700">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-2 sm:mb-3 md:mb-4 group-hover:scale-110 transition-transform">
-                <span className="text-2xl sm:text-2xl md:text-3xl">📰</span>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+            <Link href="/news" className="group bg-slate-800 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-5 lg:p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-slate-700">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-2 sm:mb-3 lg:mb-4 group-hover:scale-110 transition-transform">
+                <span className="text-2xl sm:text-2xl lg:text-3xl">📰</span>
               </div>
               <h3 className="font-bold text-gray-200 mb-1 sm:mb-2 text-sm sm:text-base">Cricket News</h3>
               <p className="text-xs sm:text-sm text-gray-400 hidden sm:block">Latest updates & stories</p>
             </Link>
-            <Link href="/series" className="group bg-slate-800 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-5 md:p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-slate-700">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-emerald-500 to-violet-500 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-2 sm:mb-3 md:mb-4 group-hover:scale-110 transition-transform">
-                <span className="text-2xl sm:text-2xl md:text-3xl">🏆</span>
+            <Link href="/series" className="group bg-slate-800 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-5 lg:p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-slate-700">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-emerald-500 to-violet-500 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-2 sm:mb-3 lg:mb-4 group-hover:scale-110 transition-transform">
+                <span className="text-2xl sm:text-2xl lg:text-3xl">🏆</span>
               </div>
               <h3 className="font-bold text-gray-200 mb-1 sm:mb-2 text-sm sm:text-base">Series</h3>
               <p className="text-xs sm:text-sm text-gray-400 hidden sm:block">Tournaments & leagues</p>
             </Link>
-            <Link href="/teams" className="group bg-slate-800 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-5 md:p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-slate-700">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-cyan-500 to-violet-500 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-2 sm:mb-3 md:mb-4 group-hover:scale-110 transition-transform">
-                <span className="text-2xl sm:text-2xl md:text-3xl">👥</span>
+            <Link href="/teams" className="group bg-slate-800 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-5 lg:p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-slate-700">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-cyan-500 to-violet-500 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-2 sm:mb-3 lg:mb-4 group-hover:scale-110 transition-transform">
+                <span className="text-2xl sm:text-2xl lg:text-3xl">👥</span>
               </div>
               <h3 className="font-bold text-gray-200 mb-1 sm:mb-2 text-sm sm:text-base">Teams</h3>
               <p className="text-xs sm:text-sm text-gray-400 hidden sm:block">Squad & player info</p>
             </Link>
-            <Link href="/rankings" className="group bg-slate-800 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-5 md:p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-slate-700">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-violet-500 to-emerald-500 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-2 sm:mb-3 md:mb-4 group-hover:scale-110 transition-transform">
-                <span className="text-2xl sm:text-2xl md:text-3xl">📊</span>
+            <Link href="/rankings" className="group bg-slate-800 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-5 lg:p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-slate-700">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-violet-500 to-emerald-500 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-2 sm:mb-3 lg:mb-4 group-hover:scale-110 transition-transform">
+                <span className="text-2xl sm:text-2xl lg:text-3xl">📊</span>
               </div>
               <h3 className="font-bold text-gray-200 mb-1 sm:mb-2 text-sm sm:text-base">Rankings</h3>
               <p className="text-xs sm:text-sm text-gray-400 hidden sm:block">ICC team & player rankings</p>
