@@ -67,8 +67,8 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className="bg-gradient-to-r from-slate-900 via-slate-950 to-black text-gray-100 shadow-xl sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4">
+    <nav className="bg-gradient-to-r from-slate-900 via-slate-950 to-black text-gray-100 shadow-xl sticky top-0 z-50 w-full overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 w-full">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">

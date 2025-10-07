@@ -46,20 +46,20 @@ export default function Home({ liveMatches, upcomingMatches, recentMatches }: {
   recentMatches: Match[]
 }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-950 to-black text-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-950 to-black text-gray-100 w-full overflow-x-hidden">
       {/* Navbar */}
       <Navbar />
 
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-slate-800 via-slate-900 to-black">
-        {/* Neon circle overlay */}
-        <div className="absolute inset-0 opacity-10">
+      <div className="relative overflow-hidden bg-gradient-to-br from-slate-800 via-slate-900 to-black w-full">
+        {/* Neon circle overlay - hidden on mobile to prevent overflow */}
+        <div className="absolute inset-0 opacity-10 hidden sm:block">
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 border-4 border-emerald-400/30 rounded-full"></div>
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 border-2 border-cyan-400/30 rounded-full"></div>
         </div>
 
         <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent"></div>
-        <div className="relative max-w-7xl mx-auto px-4 py-12 sm:py-20 md:py-32">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 md:py-32 w-full">
           <div className="text-center">
             <div className="mb-4 sm:mb-6">
               <span className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-emerald-500/10 border border-emerald-400/30 text-emerald-300 text-xs sm:text-sm font-medium">
@@ -104,7 +104,7 @@ export default function Home({ liveMatches, upcomingMatches, recentMatches }: {
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full overflow-hidden">
         {/* Quick Stats Cards */}
         <section className="mb-12 sm:mb-16 -mt-8 sm:-mt-16 relative z-10">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
