@@ -108,24 +108,46 @@ const MatchScorecard: React.FC<MatchScorecardProps> = ({
       // Regular scorecard format
       batsmen = innings.batsman || innings.batsmen || [];
       teamName = innings.batTeam || innings.batteam || '';
+      extras = innings.extras || {};
+      
       // Try multiple sources for runs with proper null checks
       totalRuns = innings.totalRuns || innings.total || 0;
+      
+      // If totalRuns is still 0, calculate it from batsmen + extras
+      if (totalRuns === 0 && batsmen.length > 0) {
+        const batsmenRuns = batsmen.reduce((sum, batsman) => {
+          const runs = batsman.runs || 0;
+          return sum + runs;
+        }, 0);
+        const extrasTotal = extras.total || 0;
+        totalRuns = batsmenRuns + extrasTotal;
+      }
+      
       totalWickets = innings.wickets || innings.totalWickets || 0;
       totalOvers = innings.overs || innings.totalOvers || 0;
-      extras = innings.extras || {};
     } else {
       // Fallback: try to extract data from other possible fields
       teamName = innings.batTeam || innings.batteam || '';
+      extras = innings.extras || {};
       totalRuns = innings.totalRuns || innings.total || innings.runs || 0;
       totalWickets = innings.totalWickets || innings.wickets || innings.wkts || 0;
       totalOvers = innings.totalOvers || innings.overs || 0;
-      extras = innings.extras || {};
       
       // Try to get batsmen data from various possible fields
       if ((innings as any).batsmenData) {
         batsmen = Object.values((innings as any).batsmenData);
       } else if (innings.batTeamDetails?.batsmenData) {
         batsmen = Object.values(innings.batTeamDetails.batsmenData);
+      }
+      
+      // If totalRuns is still 0, calculate it from batsmen + extras
+      if (totalRuns === 0 && batsmen.length > 0) {
+        const batsmenRuns = batsmen.reduce((sum, batsman) => {
+          const runs = batsman.runs || 0;
+          return sum + runs;
+        }, 0);
+        const extrasTotal = extras.total || 0;
+        totalRuns = batsmenRuns + extrasTotal;
       }
     }
     
