@@ -36,7 +36,7 @@ export const getIccRankings = async (req: Request, res: Response) => {
       url = `${url}${url.includes('?') ? '&' : '?'}formatType=${formatType}`;
     }
     
-    console.log(`Fetching rankings from: ${url}`);
+    console.log(`Fetching ${category} rankings from: ${url}`);
     const response = await axios.get(url, { headers, timeout: 15000 });
 
     res.json(response.data);
