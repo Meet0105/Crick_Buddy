@@ -1,3 +1,4 @@
+// Responsive design update - v2.0
 import axios from 'axios';
 import Link from 'next/link';
 import MatchCard from '../components/MatchCard';
