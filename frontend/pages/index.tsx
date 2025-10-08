@@ -51,7 +51,7 @@ export default function Home({ liveMatches, upcomingMatches, recentMatches }: {
       <Navbar />
 
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-slate-800 via-slate-900 to-black w-full">
+      <div className="relative overflow-hidden bg-gradient-to-br from-slate-800 via-slate-900 to-black w-full z-0">
         {/* Neon circle overlay - hidden on mobile to prevent overflow */}
         <div className="absolute inset-0 opacity-10 hidden sm:block">
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 border-4 border-emerald-400/30 rounded-full"></div>
@@ -106,59 +106,59 @@ export default function Home({ liveMatches, upcomingMatches, recentMatches }: {
 
       <main className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8 w-full overflow-hidden">
         {/* Quick Stats Cards */}
-        <section className="mb-12 sm:mb-16 -mt-8 sm:-mt-16 relative z-10">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-            <div className="group bg-slate-800 rounded-2xl sm:rounded-3xl shadow-xl p-4 sm:p-8 text-center hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-700">
-              <div className="relative mb-3 sm:mb-6">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <div className="w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full animate-pulse"></div>
+        <section className="mb-16 -mt-16 relative z-20">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="group bg-slate-800 rounded-3xl shadow-xl p-8 text-center hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-700">
+              <div className="relative mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
                 </div>
-                <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-5 h-5 sm:w-6 sm:h-6 bg-red-500 rounded-full flex items-center justify-center">
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
                   <span className="text-white text-xs font-bold">{liveMatches?.length || 0}</span>
                 </div>
               </div>
-              <h3 className="text-2xl sm:text-3xl font-black text-gray-200 mb-1 sm:mb-2">{liveMatches?.length || 0}</h3>
-              <p className="text-gray-400 font-semibold text-sm sm:text-lg">Live Now</p>
-              <div className="mt-2 sm:mt-4 h-1 bg-gradient-to-r from-red-500 to-red-600 rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+              <h3 className="text-3xl font-black text-gray-200 mb-2">{liveMatches?.length || 0}</h3>
+              <p className="text-gray-400 font-semibold text-lg">Live Now</p>
+              <div className="mt-4 h-1 bg-gradient-to-r from-red-500 to-red-600 rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
             </div>
 
-            <div className="group bg-slate-800 rounded-2xl sm:rounded-3xl shadow-xl p-4 sm:p-8 text-center hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-700">
-              <div className="relative mb-3 sm:mb-6">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="group bg-slate-800 rounded-3xl shadow-xl p-8 text-center hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-700">
+              <div className="relative mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </div>
               </div>
-              <h3 className="text-2xl sm:text-3xl font-black text-gray-200 mb-1 sm:mb-2">{upcomingMatches?.length || 0}</h3>
-              <p className="text-gray-400 font-semibold text-sm sm:text-lg">Upcoming</p>
-              <div className="mt-2 sm:mt-4 h-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+              <h3 className="text-3xl font-black text-gray-200 mb-2">{upcomingMatches?.length || 0}</h3>
+              <p className="text-gray-400 font-semibold text-lg">Upcoming</p>
+              <div className="mt-4 h-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
             </div>
 
-            <div className="group bg-slate-800 rounded-2xl sm:rounded-3xl shadow-xl p-4 sm:p-8 text-center hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-700">
-              <div className="relative mb-3 sm:mb-6">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="group bg-slate-800 rounded-3xl shadow-xl p-8 text-center hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-700">
+              <div className="relative mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
               </div>
-              <h3 className="text-2xl sm:text-3xl font-black text-gray-200 mb-1 sm:mb-2">{recentMatches?.length || 0}</h3>
-              <p className="text-gray-400 font-semibold text-sm sm:text-lg">Completed</p>
-              <div className="mt-2 sm:mt-4 h-1 bg-gradient-to-r from-green-500 to-green-600 rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+              <h3 className="text-3xl font-black text-gray-200 mb-2">{recentMatches?.length || 0}</h3>
+              <p className="text-gray-400 font-semibold text-lg">Completed</p>
+              <div className="mt-4 h-1 bg-gradient-to-r from-green-500 to-green-600 rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
             </div>
 
-            <div className="group bg-slate-800 rounded-2xl sm:rounded-3xl shadow-xl p-4 sm:p-8 text-center hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-700">
-              <div className="relative mb-3 sm:mb-6">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="group bg-slate-800 rounded-3xl shadow-xl p-8 text-center hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-700">
+              <div className="relative mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                   </svg>
                 </div>
               </div>
-              <h3 className="text-2xl sm:text-3xl font-black text-gray-200 mb-1 sm:mb-2">12</h3>
-              <p className="text-gray-400 font-semibold text-sm sm:text-lg">Active Series</p>
-              <div className="mt-2 sm:mt-4 h-1 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+              <h3 className="text-3xl font-black text-gray-200 mb-2">12</h3>
+              <p className="text-gray-400 font-semibold text-lg">Active Series</p>
+              <div className="mt-4 h-1 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
             </div>
           </div>
         </section>
